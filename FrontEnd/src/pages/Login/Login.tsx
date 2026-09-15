@@ -42,7 +42,7 @@ function Login() {
     <main className="grid min-h-screen grid-cols-1 bg-[#fbfcfe] text-[#182238] min-[821px]:grid-cols-[minmax(400px,44%)_1fr]">
       <section className="relative flex min-h-[300px] flex-col overflow-hidden bg-[#101a30] px-[8vw] py-7 text-[#f5f7ff] min-[821px]:min-h-0 min-[821px]:px-[7vw] min-[821px]:py-12" aria-label="Application introduction">
         <div className="relative z-10 grid h-9 w-9 place-items-center rounded-[9px] border border-[#435491] bg-[#1d2a52] text-[17px] font-bold text-[#9eafff]"><span className="grid h-3.5 w-3.5 place-items-center rounded-full border-2 border-current text-[9px]">✓</span></div>
-        <span className="absolute left-[calc(8vw+48px)] top-9 font-['Manrope'] text-[17px] font-bold min-[821px]:left-[calc(7vw+48px)] min-[821px]:top-[55px]">Your App</span>
+        <span className="absolute left-[calc(8vw+48px)] top-9 font-['Manrope'] text-[17px] font-bold min-[821px]:left-[calc(7vw+48px)] min-[821px]:top-[55px]">Veloura</span>
 
         <div className="relative z-10 my-[70px] max-w-[440px] min-[821px]:my-auto">
           <p className="mb-3.5 text-xs font-bold uppercase tracking-[.12em] text-[#7283b0]">A better way to work together</p>

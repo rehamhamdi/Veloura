@@ -33,7 +33,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.MapSwagger();
     app.UseSwaggerUI();
-    app.MapOpenApi();
 }
 
 

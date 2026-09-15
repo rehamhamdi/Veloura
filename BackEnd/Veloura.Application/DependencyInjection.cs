@@ -1,7 +1,8 @@
-﻿// Application/DependencyInjection.cs
+﻿using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Veloura.Application.Common.Behaviors;
 
 namespace Veloura.Application;
 
@@ -12,8 +13,8 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-        //  FluentValidation 
-        // services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
         return services;
     }

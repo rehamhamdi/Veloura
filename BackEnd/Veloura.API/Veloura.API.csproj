@@ -4,10 +4,12 @@
 		<TargetFramework>net9.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-	</PropertyGroup>
+	  <UserSecretsId>6b258f0d-5861-40fb-8eb5-686ad425990c</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="MediatR" Version="14.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.20" />
 
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.20">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -16,7 +18,7 @@
 
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
 	</ItemGroup>
 
 	<ItemGroup>

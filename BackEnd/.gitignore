@@ -15,7 +15,16 @@ packages/
 
 # Environment / secrets
 .env
+appsettings.json
 
 # OS
 .DS_Store
 Thumbs.db
+
+*.Backup.tmp
+migration.sql
+
+# Publish profiles
+**/Properties/PublishProfiles/
+*.pubxml
+*.pubxml.user

@@ -16,6 +16,9 @@ public class AddAddressHandler : IRequestHandler<AddAddressCommand, AddressDto>
 
     public async Task<AddressDto> Handle(AddAddressCommand request, CancellationToken cancellationToken)
     {
+        if (request.IsDefault)
+            await _addressRepository.UnsetDefaultForUserAsync(request.UserId, cancellationToken);
+
         var address = new Address
         {
             UserId = request.UserId,

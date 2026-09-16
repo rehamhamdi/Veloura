@@ -33,4 +33,9 @@ public class EfAddressRepository : IAddressRepository
         _db.Addresses.Remove(address);
         await _db.SaveChangesAsync(ct);
     }
+
+    public Task UnsetDefaultForUserAsync(int userId, CancellationToken ct) =>
+        _db.Addresses
+            .Where(a => a.UserId == userId && a.IsDefault)
+            .ExecuteUpdateAsync(s => s.SetProperty(a => a.IsDefault, false), ct);
 }

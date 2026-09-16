@@ -25,6 +25,9 @@ public class UpdateAddressHandler : IRequestHandler<UpdateAddressCommand, Addres
         if (address is null || address.UserId != request.UserId)
             throw new NotFoundException(nameof(Address), request.AddressId);
 
+        if (request.IsDefault)
+            await _addressRepository.UnsetDefaultForUserAsync(request.UserId, cancellationToken);
+
         address.Label = request.Label;
         address.Street = request.Street;
         address.City = request.City;

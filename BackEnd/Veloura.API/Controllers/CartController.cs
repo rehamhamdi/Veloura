@@ -12,7 +12,7 @@ namespace Veloura.API.Controllers;
 
 [ApiController]
 [Route("api/cart")]
-[Authorize] 
+[Authorize(Roles = "Buyer")]
 public class CartController : ControllerBase
 {
     private readonly ISender _mediator;

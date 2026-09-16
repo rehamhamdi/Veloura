@@ -63,6 +63,13 @@ public class ResponseHandler
         Message = message
     };
 
+    public Response<T> Conflict<T>(string? message = null) => new()
+    {
+        StatusCode = HttpStatusCode.Conflict,
+        Succeeded = false,
+        Message = message
+    };
+
     public Response<T> InternalServerError<T>(string? message = "An unexpected error occurred") => new()
     {
         StatusCode = HttpStatusCode.InternalServerError,

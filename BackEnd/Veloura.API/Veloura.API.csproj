@@ -8,7 +8,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MediatR" Version="14.2.0" />
+		<PackageReference Include="MediatR" Version="13.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.20" />
 
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.20">
@@ -24,10 +24,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Veloura.Application\Veloura.Application.csproj" />
 		<ProjectReference Include="..\Veloura.Infrastructure\Veloura.Infrastructure.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Controllers\" />
 	</ItemGroup>
 
 </Project>

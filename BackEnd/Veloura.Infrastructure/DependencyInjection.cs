@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Veloura.Application.Interfaces;
@@ -16,12 +17,18 @@ public static class DependencyInjection
     {
         var connectionMode = configuration["ConnectionMode"];
 
-        var connectionString = connectionMode == "Prod"
+        var connectionString = connectionMode?.Equals("Prod", StringComparison.OrdinalIgnoreCase) == true
             ? configuration.GetConnectionString("ProdCS")
             : configuration.GetConnectionString("DevCS");
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddScoped<IAppDbContext>(sp =>
+            sp.GetRequiredService<AppDbContext>());
+
+        services.AddMediatR(cfg =>
+            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
         services.AddScoped<IUserRepository, EfUserRepository>();
         services.AddScoped<IAddressRepository, EfAddressRepository>();

@@ -12,7 +12,7 @@ namespace Veloura.API.Controllers;
 
 [ApiController]
 [Route("api/cart")]
-//[Authorize] // Server-side cart is for logged-in Buyers; Guests keep their cart client-side.
+[Authorize] 
 public class CartController : ControllerBase
 {
     private readonly ISender _mediator;
@@ -22,11 +22,9 @@ public class CartController : ControllerBase
         _mediator = mediator;
     }
 
-    //private int CurrentUserId =>
-    //    int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    private int CurrentUserId =>
+        int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-    private int CurrentUserId => 1;
-    /// <summary>GET /api/cart</summary>
     [HttpGet]
     public async Task<IActionResult> GetCart(CancellationToken cancellationToken)
     {
@@ -34,7 +32,6 @@ public class CartController : ControllerBase
         return StatusCode((int)response.StatusCode, response);
     }
 
-    /// <summary>POST /api/cart/items</summary>
     [HttpPost("items")]
     public async Task<IActionResult> AddItem([FromBody] AddCartItemRequest request, CancellationToken cancellationToken)
     {
@@ -43,7 +40,6 @@ public class CartController : ControllerBase
         return StatusCode((int)response.StatusCode, response);
     }
 
-    /// <summary>PUT /api/cart/items/{cartItemId}</summary>
     [HttpPut("items/{cartItemId:int}")]
     public async Task<IActionResult> UpdateItem(int cartItemId, [FromBody] UpdateCartItemRequest request, CancellationToken cancellationToken)
     {
@@ -52,7 +48,6 @@ public class CartController : ControllerBase
         return StatusCode((int)response.StatusCode, response);
     }
 
-    /// <summary>DELETE /api/cart/items/{cartItemId}</summary>
     [HttpDelete("items/{cartItemId:int}")]
     public async Task<IActionResult> RemoveItem(int cartItemId, CancellationToken cancellationToken)
     {

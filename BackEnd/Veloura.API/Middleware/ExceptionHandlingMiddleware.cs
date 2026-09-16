@@ -30,7 +30,7 @@ public class ExceptionHandlingMiddleware
                 EmailAlreadyExistsException => (HttpStatusCode.Conflict, ex.Message),
                 InvalidCredentialsException => (HttpStatusCode.Unauthorized, ex.Message),
                 NotFoundException => (HttpStatusCode.NotFound, ex.Message),
-                _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
+                _ => (HttpStatusCode.InternalServerError, ex.Message)
             };
 
             if (statusCode == HttpStatusCode.InternalServerError)

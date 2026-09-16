@@ -63,6 +63,6 @@ public class AddCartItemHandler : IRequestHandler<AddCartItemCommand, Response<C
             AvailableStock = product.Stock
         };
 
-        return _responseHandler.Created(dto, "Item added to cart.");
+        return _responseHandler.Created(dto, "Item added to cart");
     }
 }

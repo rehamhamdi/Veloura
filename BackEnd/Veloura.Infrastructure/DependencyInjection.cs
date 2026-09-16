@@ -1,5 +1,4 @@
-﻿using Veloura.Application.Interfaces;
-using Veloura.Infrastructure.Persistence;
+﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +29,7 @@ public static class DependencyInjection
 
         services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
         services.AddScoped<IUserRepository, EfUserRepository>();
         services.AddScoped<IAddressRepository, EfAddressRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();

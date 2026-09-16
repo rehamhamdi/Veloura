@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Veloura.Application.Common.Wrappers;
 
-namespace Veloura.Application.Common.Behaviours;
+namespace Veloura.Application.Common.Behaviors;
 public class ValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {

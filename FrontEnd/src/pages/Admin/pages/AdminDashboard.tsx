@@ -1,19 +1,24 @@
 import { Sparkles } from 'lucide-react'
 import { useState } from 'react'
-import AdminHeader from '../../components/admin/AdminHeader'
-import AdminSidebar from '../../components/admin/AdminSidebar'
-import RecentOrders from '../../components/admin/RecentOrders'
-import SalesOverview from '../../components/admin/SalesOverview'
-import StatsGrid from '../../components/admin/StatsGrid'
-import TopProducts from '../../components/admin/TopProducts'
+import { useNavigate } from 'react-router-dom'
+import AdminHeader from '../../../components/admin/AdminHeader'
+import AdminSidebar from '../../../components/admin/AdminSidebar'
+import RecentOrders from '../../../components/admin/RecentOrders'
+import SalesOverview from '../../../components/admin/SalesOverview'
+import StatsGrid from '../../../components/admin/StatsGrid'
+import TopProducts from '../../../components/admin/TopProducts'
 
 function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [activeNav, setActiveNav] = useState('Dashboard')
+  const navigate = useNavigate()
 
   function selectNavigation(item: string) {
     setActiveNav(item)
     setSidebarOpen(false)
+
+    if (item === 'Orders') navigate('/admin/orders')
+    if (item === 'Dashboard') navigate('/admin')
   }
 
   return <div className="min-h-screen bg-[#f8f3ed] text-[#3b2a29]">

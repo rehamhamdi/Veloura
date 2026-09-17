@@ -1,10 +1,14 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using Veloura.API.Middleware;
 using Veloura.Application;
+using Veloura.Application.Interfaces;
 using Veloura.Infrastructure;
+using Veloura.Infrastructure.Repositories;
+using Veloura.Infrastructure.Persistence;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +42,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -70,6 +76,7 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

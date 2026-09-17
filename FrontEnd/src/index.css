@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&family=Playfair+Display:wght@500;600&family=Tajawal:wght@400;500;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  font-family: 'DM Sans', sans-serif;
+  color: #3b2a29;
+  background: #f8f3ed;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, input { font-family: inherit; }
+
+html[lang='ar'] body,
+html[lang='ar'] button,
+html[lang='ar'] input {
+  font-family: 'Tajawal', sans-serif;
+}
+
+html[lang='ar'] h1,
+html[lang='ar'] h2,
+html[lang='ar'] h3,
+html[lang='ar'] h4,
+html[lang='ar'] h5,
+html[lang='ar'] h6,
+html[lang='ar'] [class*="font-['Playfair_Display']"] {
+  font-family: 'Noto Kufi Arabic', sans-serif !important;
+  letter-spacing: 0;
+}

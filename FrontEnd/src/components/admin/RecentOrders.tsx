@@ -1,0 +1,15 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { orders } from './adminData'
+
+function statusClass(status: string) {
+  if (status === 'Processing') return 'bg-[#f6ead1] text-[#9a713c]'
+  if (status === 'Shipped') return 'bg-[#e6edf2] text-[#5d778a]'
+  if (status === 'Delivered') return 'bg-[#e4efe7] text-[#63846f]'
+  return 'bg-[#f2e3e1] text-[#a36c69]'
+}
+
+function RecentOrders() {
+  return <section className="mt-6 rounded-[16px] border border-[#eaded5] bg-[#fffdf9] p-5 sm:p-6"><div className="mb-5 flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#806786]" /><p className="m-0 text-sm font-bold text-[#493331]">Recent orders</p></div><p className="mb-0 mt-2 text-xs text-[#a38b83]">Keep track of your latest customer orders</p></div><button className="hidden items-center gap-1 text-[11px] font-bold text-[#a86f6b] hover:text-[#6d4946] sm:flex">View all orders <ChevronRight size={14} /></button></div><div className="overflow-x-auto"><table className="w-full min-w-[680px] border-collapse text-left"><thead><tr className="border-b border-[#f0e5de] text-[10px] font-bold uppercase tracking-[.1em] text-[#b09a92]"><th className="pb-3 pl-2">Order ID</th><th className="pb-3">Customer</th><th className="pb-3">Date</th><th className="pb-3">Total</th><th className="pb-3">Status</th><th className="pb-3 pr-2 text-right">Action</th></tr></thead><tbody>{orders.map((order) => <tr key={order.id} className="border-b border-[#f3eae4] last:border-0"><td className="py-4 pl-2 text-xs font-bold text-[#6d4946]">{order.id}</td><td className="py-4"><div className="flex items-center gap-2.5"><span className="grid h-7 w-7 place-items-center rounded-full bg-[#f3e4dc] text-[9px] font-bold text-[#8e5d5a]">{order.initials}</span><span className="text-xs font-semibold text-[#493331]">{order.customer}</span></div></td><td className="py-4 text-[11px] text-[#9e8780]">{order.date}</td><td className="py-4 text-xs font-bold text-[#493331]">{order.total}</td><td className="py-4"><span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${statusClass(order.status)}`}>{order.status}</span></td><td className="py-4 pr-2 text-right"><button className="text-[11px] font-bold text-[#a86f6b] hover:text-[#6d4946]">View</button></td></tr>)}</tbody></table></div><div className="mt-4 flex items-center justify-between border-t border-[#f0e5de] pt-4"><p className="m-0 text-[11px] text-[#aa938b]">Showing 4 of 128 orders</p><div className="flex gap-1"><button className="grid h-7 w-7 place-items-center rounded-[7px] border border-[#eaded5] text-[#aa938b] hover:bg-[#faf2ec]" aria-label="Previous page"><ChevronLeft size={14} /></button><button className="grid h-7 w-7 place-items-center rounded-[7px] border border-[#eaded5] text-[#aa938b] hover:bg-[#faf2ec]" aria-label="Next page"><ChevronRight size={14} /></button></div></div></section>
+}
+
+export default RecentOrders

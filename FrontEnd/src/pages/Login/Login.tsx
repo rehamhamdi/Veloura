@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { loginUser } from '../../features/auth/authSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 
@@ -9,6 +9,7 @@ function Login() {
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { error: apiError, isLoading } = useAppSelector((state) => state.auth)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -31,10 +32,12 @@ function Login() {
     }
 
     try {
-      await dispatch(loginUser({ email, password })).unwrap()
+      const authResponse = await dispatch(loginUser({ email, password })).unwrap()
       setSubmitted(true)
-    } catch {
+      navigate(authResponse.user.role === 'admin' ? '/admin' : '/', { replace: true })
+    } catch (loginError) {
       setSubmitted(false)
+      setError(loginError instanceof Error ? loginError.message : 'Login failed. Please try again.')
     }
   }
 

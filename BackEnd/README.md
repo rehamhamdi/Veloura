@@ -129,10 +129,29 @@ dotnet run --project Veloura.API
 
 ---
 
-##  API Documentation
+## API Documentation
 
-Swagger UI is available in Development mode at:
+Veloura provides interactive API documentation using **Swagger**.
+
+You can access the API documentation in both local development and production environments.
+
+### Local Development
+
+When running the project locally, Swagger UI is available at:
 
 ```text
-https://localhost:7235/swagger
+https://localhost:7235/swagger/index.html
 ```
+
+### Production
+
+The backend is deployed and publicly accessible through MonsterASP.
+
+Swagger UI:
+
+```text
+https://veloura.runasp.net/swagger/index.html
+```
+
+The production API can be used by the frontend team for API integration and testing.
+

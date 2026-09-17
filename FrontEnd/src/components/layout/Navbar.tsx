@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
+import { LogOut, Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
+import { logout } from '../../features/auth/authSlice'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const dispatch = useAppDispatch()
+  const isAuthenticated = Boolean(useAppSelector((state) => state.auth.token))
 
   useEffect(() => {
     function handleScroll() {
@@ -17,6 +21,11 @@ function Navbar() {
 
   function closeMenu() {
     setMenuOpen(false)
+  }
+
+  function handleLogout() {
+    dispatch(logout())
+    closeMenu()
   }
 
   return (
@@ -37,6 +46,7 @@ function Navbar() {
         <div className="flex items-center gap-1 text-[#624943]">
           <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" aria-label="Search"><Search size={18} strokeWidth={1.6} /></button>
           <Link className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" to="/login" aria-label="Account"><UserRound size={18} strokeWidth={1.6} /></Link>
+          {isAuthenticated && <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" onClick={handleLogout} aria-label="Log out"><LogOut size={18} strokeWidth={1.6} /></button>}
           <button className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc]" type="button" aria-label="Shopping bag"><ShoppingBag size={18} strokeWidth={1.6} /><span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#76504c] px-1 text-[9px] font-bold text-white">0</span></button>
           <button className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] lg:hidden" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>{menuOpen ? <X size={21} strokeWidth={1.6} /> : <Menu size={21} strokeWidth={1.6} />}</button>
         </div>
@@ -49,6 +59,7 @@ function Navbar() {
           <a href="#categories" onClick={closeMenu}>Categories</a>
           <a href="#about" onClick={closeMenu}>About Us</a>
           <Link to="/login" onClick={closeMenu}>Account</Link>
+          {isAuthenticated && <button className="text-left" type="button" onClick={handleLogout}>Log out</button>}
         </div>
       </div>}
     </header>

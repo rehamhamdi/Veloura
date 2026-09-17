@@ -1,9 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAppSelector } from '../store/hooks'
-
-type RoleRouteProps = {
-  allowedRoles: string[]
-}
+import type { RoleRouteProps } from '../types/routeGuards'
 
 export function RequireAuth() {
   const { token } = useAppSelector((state) => state.auth)

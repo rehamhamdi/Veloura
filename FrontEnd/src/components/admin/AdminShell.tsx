@@ -1,13 +1,8 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminHeader from './AdminHeader'
 import AdminSidebar from './AdminSidebar'
-
-type AdminShellProps = {
-  activeItem: string
-  children: ReactNode
-}
+import type { AdminShellProps } from '../../types/adminShell'
 
 function AdminShell({ activeItem, children }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -16,6 +11,7 @@ function AdminShell({ activeItem, children }: AdminShellProps) {
   function selectNavigation(item: string) {
     setSidebarOpen(false)
     if (item === 'Orders') navigate('/admin/orders')
+    if (item === 'Products') navigate('/admin/products')
     if (item === 'Dashboard') navigate('/admin')
   }
 

@@ -1,54 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { AxiosError } from 'axios'
 import api from '../../services/api'
-
-export type UserRole = 'user' | 'buyer' | 'customer' | 'admin'
-
-export type User = {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-type AuthResponse = {
-  token: string
-  user: User
-}
-
-type RawAuthResponse = {
-  token?: string
-  accessToken?: string
-  user?: User
-  data?: {
-    token?: string
-    accessToken?: string
-    user?: User
-  } | User
-}
-
-type RegisterPayload = {
-  name: string
-  email: string
-  password: string
-}
-
-type LoginPayload = {
-  email: string
-  password: string
-}
-
-type ApiErrorResponse = {
-  message?: string
-  error?: string
-}
-
-type AuthState = {
-  user: User | null
-  token: string | null
-  isLoading: boolean
-  error: string | null
-}
+import type { ApiErrorResponse, AuthResponse, AuthState, LoginPayload, RawAuthResponse, RegisterPayload, User, UserRole } from '../../types/auth'
 
 const initialState: AuthState = {
   user: readStoredUser(),

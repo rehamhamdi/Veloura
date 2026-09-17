@@ -7,6 +7,7 @@ import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
 import AdminDashboard from './pages/Admin/pages/AdminDashboard'
 import AdminOrders from './pages/Admin/pages/AdminOrders'
+import AdminProducts from './pages/Admin/pages/AdminProducts'
 import { RequireAuth, RequireGuest, RequireRole } from './middleware/routeGuards'
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route element={<RequireRole allowedRoles={['admin']} />}>
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/register" replace />} />

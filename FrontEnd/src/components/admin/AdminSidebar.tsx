@@ -2,9 +2,8 @@ import { LogOut, Settings, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../../features/auth/authSlice'
 import { useAppDispatch } from '../../store/hooks'
+import type { AdminSidebarProps } from '../../types/adminSidebar'
 import { navigation } from './adminData'
-
-type AdminSidebarProps = { open: boolean; activeItem: string; onClose: () => void; onSelect: (item: string) => void }
 
 function AdminSidebar({ open, activeItem, onClose, onSelect }: AdminSidebarProps) {
   const dispatch = useAppDispatch()

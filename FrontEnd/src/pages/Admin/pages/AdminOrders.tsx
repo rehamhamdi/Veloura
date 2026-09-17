@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, LoaderCircle, RefreshCw, Search } from 'lucide-react'
 import AdminShell from '../../../components/admin/AdminShell'
 import OrderDetailsModal from '../../../components/admin/OrderDetailsModal'
-import { getAdminOrders, type AdminOrder } from '../../../services/adminOrders'
+import { getAdminOrders } from '../../../services/adminOrders'
+import type { AdminOrder } from '../../../types/adminOrders'
 
 const statusClasses: Record<string, string> = {
   processing: 'bg-[#f6ead1] text-[#9a713c]',

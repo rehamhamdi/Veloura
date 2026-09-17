@@ -1,14 +1,10 @@
 import { LoaderCircle, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { getAdminOrder, updateAdminOrderStatus, type AdminOrder } from '../../services/adminOrders'
+import { getAdminOrder, updateAdminOrderStatus } from '../../services/adminOrders'
+import type { AdminOrder } from '../../types/adminOrders'
+import type { OrderDetailsModalProps } from '../../types/orderDetailsModal'
 
 const statuses = ['Processing', 'Shipped', 'Delivered', 'Cancelled']
-
-type OrderDetailsModalProps = {
-  orderId: string | number
-  onClose: () => void
-  onUpdated: (order: AdminOrder) => void
-}
 
 function money(value?: number) {
   return typeof value === 'number' ? `$${value.toFixed(2)}` : '—'

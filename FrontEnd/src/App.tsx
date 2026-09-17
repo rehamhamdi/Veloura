@@ -9,6 +9,7 @@ import AdminDashboard from './pages/Admin/pages/AdminDashboard'
 import AdminOrders from './pages/Admin/pages/AdminOrders'
 import AdminProducts from './pages/Admin/pages/AdminProducts'
 import AdminCategories from './pages/Admin/pages/AdminCategories'
+import AdminCustomers from './pages/Admin/pages/AdminCustomers'
 import { RequireAuth, RequireGuest, RequireRole } from './middleware/routeGuards'
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
+          <Route path="/admin/customers" element={<AdminCustomers />} />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/register" replace />} />

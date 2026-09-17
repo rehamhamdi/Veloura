@@ -2,10 +2,12 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { AtSign, Camera, PinIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useI18n } from '../../i18n/I18nProvider'
 
 function Footer() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const { t } = useI18n()
 
   function handleNewsletterSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -18,26 +20,26 @@ function Footer() {
         <div className="grid gap-12 border-b border-[#755852] pb-14 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
           <div>
             <Link className="font-['Playfair_Display'] text-3xl" to="/">Veloura</Link>
-            <p className="mt-5 max-w-[270px] text-sm leading-[1.8] text-[#d8bdb3]">Thoughtful skincare for softer rituals and naturally radiant days.</p>
+            <p className="mt-5 max-w-[270px] text-sm leading-[1.8] text-[#d8bdb3]">{t('footer.description')}</p>
             <div className="mt-6 flex gap-3">
               <a className="grid h-9 w-9 place-items-center rounded-full border border-[#8b6860] transition hover:bg-[#76504c]" href="#footer" aria-label="Instagram"><Camera size={16} /></a>
               <a className="grid h-9 w-9 place-items-center rounded-full border border-[#8b6860] transition hover:bg-[#76504c]" href="#footer" aria-label="Facebook"><AtSign size={16} /></a>
               <a className="grid h-9 w-9 place-items-center rounded-full border border-[#8b6860] transition hover:bg-[#76504c]" href="#footer" aria-label="Pinterest"><PinIcon size={16} /></a>
             </div>
           </div>
-          <FooterColumn title="Quick links" links={['Home', 'Shop', 'About Us', 'Contact']} />
-          <FooterColumn title="Customer care" links={['Shipping', 'Returns', 'FAQ', 'Privacy Policy']} />
+          <FooterColumn title={t('footer.quickLinks')} links={[t('nav.home'), t('nav.shop'), t('nav.about'), t('footer.contact')]} />
+          <FooterColumn title={t('footer.customerCare')} links={[t('footer.shipping'), t('footer.returns'), t('footer.faq'), t('footer.privacy')]} />
           <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-[.18em] text-[#e6c7bc]">Stay in the ritual</h3>
-            <p className="mt-4 text-sm leading-[1.7] text-[#d8bdb3]">Notes on skin, self-care, and new Veloura arrivals.</p>
+            <h3 className="text-[11px] font-bold uppercase tracking-[.18em] text-[#e6c7bc]">{t('footer.stay')}</h3>
+            <p className="mt-4 text-sm leading-[1.7] text-[#d8bdb3]">{t('footer.stayText')}</p>
             <form className="mt-5 flex border-b border-[#8b6860] pb-2" onSubmit={handleNewsletterSubmit}>
-              <input className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#b8958c]" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Your email address" aria-label="Email address" required />
-              <button className="text-[12px] font-bold text-[#f3d9d0]" type="submit">Subscribe</button>
+              <input className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#b8958c]" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={t('footer.email')} aria-label={t('footer.email')} required />
+              <button className="text-[12px] font-bold text-[#f3d9d0]" type="submit">{t('footer.subscribe')}</button>
             </form>
-            {subscribed && <p className="mt-3 text-xs text-[#d6e5c9]" role="status">You're on the list. Welcome to the ritual.</p>}
+            {subscribed && <p className="mt-3 text-xs text-[#d6e5c9]" role="status">{t('footer.subscribed')}</p>}
           </div>
         </div>
-        <div className="flex flex-col gap-3 pt-6 text-[11px] text-[#b8958c] sm:flex-row sm:items-center sm:justify-between"><span>© 2026 Veloura. All rights reserved.</span><span>Made for your everyday ritual.</span></div>
+        <div className="flex flex-col gap-3 pt-6 text-[11px] text-[#b8958c] sm:flex-row sm:items-center sm:justify-between"><span>© 2026 Veloura. {t('footer.rights')}</span><span>{t('home.mindful')}</span></div>
       </div>
     </footer>
   )

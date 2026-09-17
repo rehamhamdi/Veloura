@@ -3,6 +3,7 @@ import { MoreHorizontal, Plus, Search, SlidersHorizontal } from "lucide-react";
 import AdminShell from "../../../components/admin/AdminShell";
 import Dropdown from "../../../components/ui/Dropdown";
 import type { AdminProduct } from "../../../types/adminProducts";
+import { useI18n } from "../../../i18n/I18nProvider";
 
 const products: AdminProduct[] = [
   {
@@ -83,6 +84,7 @@ function AdminProducts() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All categories");
   const [status, setStatus] = useState("All status");
+  const { t } = useI18n();
 
   const categories = [
     "All categories",
@@ -121,18 +123,18 @@ function AdminProducts() {
           <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
               <p className="mb-2 text-[11px] font-bold uppercase tracking-[.18em] text-[#a86f6b]">
-                Workspace / Products
+                {t('admin.workspace')} / {t('admin.products')}
               </p>
               <h2 className="font-['Playfair_Display'] text-[clamp(2rem,4vw,2.75rem)] font-medium leading-tight text-[#3b2a29]">
-                Products
+                {t('admin.products')}
               </h2>
               <p className="mt-2 text-sm text-[#806967]">
-                Curate the essentials that make up the Veloura ritual.
+                {t('admin.manageProducts')}
               </p>
             </div>
             <button className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[11px] bg-[#6d4946] px-4 text-xs font-bold text-[#fffaf5] shadow-[0_8px_18px_rgba(109,73,70,.14)] transition hover:bg-[#583a38] sm:self-auto">
               <Plus size={16} />
-              Add product
+              {t('admin.addProduct')}
             </button>
           </div>
           <section className="mb-6 grid gap-3 sm:grid-cols-3">

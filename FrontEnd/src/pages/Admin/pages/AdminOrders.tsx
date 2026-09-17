@@ -4,6 +4,7 @@ import AdminShell from '../../../components/admin/AdminShell'
 import OrderDetailsModal from '../../../components/admin/OrderDetailsModal'
 import { getAdminOrders } from '../../../services/adminOrders'
 import type { AdminOrder } from '../../../types/adminOrders'
+import { useI18n } from '../../../i18n/I18nProvider'
 
 const statusClasses: Record<string, string> = {
   processing: 'bg-[#f6ead1] text-[#9a713c]',
@@ -38,6 +39,7 @@ function AdminOrders() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [selectedOrderId, setSelectedOrderId] = useState<string | number | null>(null)
+  const { t } = useI18n()
 
   async function loadOrders(nextPage = page) {
     setIsLoading(true)
@@ -71,7 +73,7 @@ function AdminOrders() {
   }
 
   return <AdminShell activeItem="Orders"><main className="min-h-[calc(100vh-76px)] bg-[#f8f3ed] px-5 py-8 sm:px-8 lg:px-10 lg:py-10"><div className="mx-auto max-w-[1440px]">
-    <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="mb-2 text-[11px] font-bold uppercase tracking-[.18em] text-[#a86f6b]">Workspace / Orders</p><h2 className="font-['Playfair_Display'] text-[clamp(2rem,4vw,2.75rem)] font-medium leading-tight text-[#3b2a29]">Orders</h2><p className="mt-2 text-sm text-[#806967]">Manage and review every order from your store.</p></div><button className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[11px] border border-[#e5d6cd] bg-[#fffdf9] px-4 text-xs font-bold text-[#6d4946] transition hover:bg-[#f3e4dc] sm:self-auto" onClick={() => void loadOrders()}><RefreshCw size={15} />Refresh</button></div>
+    <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end"><div><p className="mb-2 text-[11px] font-bold uppercase tracking-[.18em] text-[#a86f6b]">{t('admin.workspace')} / {t('admin.orders')}</p><h2 className="font-['Playfair_Display'] text-[clamp(2rem,4vw,2.75rem)] font-medium leading-tight text-[#3b2a29]">{t('admin.orders')}</h2><p className="mt-2 text-sm text-[#806967]">{t('admin.manageOrders')}</p></div><button className="inline-flex h-10 items-center justify-center gap-2 self-start rounded-[11px] border border-[#e5d6cd] bg-[#fffdf9] px-4 text-xs font-bold text-[#6d4946] transition hover:bg-[#f3e4dc] sm:self-auto" onClick={() => void loadOrders()}><RefreshCw size={15} />{t('admin.refresh')}</button></div>
     <section className="rounded-[16px] border border-[#eaded5] bg-[#fffdf9] p-5 shadow-[0_8px_25px_rgba(91,55,53,.035)] sm:p-6"><div className="mb-5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="m-0 text-sm font-bold text-[#493331]">All orders</p><p className="mb-0 mt-2 text-xs text-[#a38b83]">{totalCount} orders in your store</p></div><label className="flex h-10 w-full items-center gap-2.5 rounded-full border border-[#e7d9d0] bg-[#fffaf5] px-4 text-[#b09a92] sm:w-[240px]"><Search size={16} strokeWidth={1.7} /><input className="w-full bg-transparent text-xs text-[#493331] outline-none placeholder:text-[#b09a92]" placeholder="Search orders..." value={search} onChange={(event) => setSearch(event.target.value)} aria-label="Search orders" /></label></div>
       {isLoading && <div className="flex min-h-[280px] items-center justify-center gap-2 text-sm text-[#806967]"><LoaderCircle className="animate-spin" size={18} />Loading orders...</div>}
       {!isLoading && error && <div className="flex min-h-[280px] flex-col items-center justify-center gap-4 text-center"><p className="m-0 text-sm text-[#a36c69]">{error}</p><button className="rounded-[9px] bg-[#6d4946] px-4 py-2 text-xs font-bold text-[#fffaf5]" onClick={() => void loadOrders()}>Try again</button></div>}

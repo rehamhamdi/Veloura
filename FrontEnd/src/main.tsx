@@ -5,13 +5,16 @@ import { Provider } from 'react-redux'
 import './index.css'
 import App from './App'
 import { store } from './store/store'
+import { I18nProvider } from './i18n/I18nProvider'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <I18nProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </I18nProvider>
     </Provider>
   </StrictMode>,
 )

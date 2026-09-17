@@ -5,6 +5,8 @@ import WebsiteLayout from './layouts/WebsiteLayout'
 import Home from './pages/Home/Home'
 import Login from './pages/Login/Login'
 import Register from './pages/Register/Register'
+import AdminDashboard from './pages/Admin/AdminDashboard'
+import { RequireAuth, RequireGuest, RequireRole } from './middleware/routeGuards'
 
 function App() {
   return (
@@ -12,8 +14,15 @@ function App() {
       <Route element={<WebsiteLayout />}>
         <Route path="/" element={<Home />} />
       </Route>
-      <Route path="/register" element={<Register />} />
-      <Route path="/login" element={<Login />} />
+      <Route element={<RequireGuest />}>
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+      </Route>
+      <Route element={<RequireAuth />}>
+        <Route element={<RequireRole allowedRoles={['admin']} />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+      </Route>
       <Route path="*" element={<Navigate to="/register" replace />} />
     </Routes>
   )

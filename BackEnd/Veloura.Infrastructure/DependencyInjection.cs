@@ -34,6 +34,15 @@ public static class DependencyInjection
         services.AddScoped<IAddressRepository, EfAddressRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IUserRepository, EfUserRepository>();
+        services.AddScoped<IAddressRepository, EfAddressRepository>();
+
+        services.AddScoped<IProductRepository, EfProductRepository>();
+        services.AddScoped<IProductImageRepository, EfProductImageRepository>();
+        services.AddScoped<IWishlistItemRepository, EfWishlistItemRepository>();
+
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;
     }

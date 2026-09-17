@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://veloura.runasp.net/api/:path*"
+    }
+  ]
+}

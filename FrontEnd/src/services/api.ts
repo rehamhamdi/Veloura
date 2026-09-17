@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'https://veloura.runasp.net/api/',
+  baseURL: import.meta.env.VITE_API_URL ?? (import.meta.env.PROD ? '/api/' : 'https://veloura.runasp.net/api/'),
   headers: {
     'Content-Type': 'application/json',
   },

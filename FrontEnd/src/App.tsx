@@ -11,12 +11,19 @@ import AdminProducts from './pages/Admin/pages/AdminProducts'
 import AdminCategories from './pages/Admin/pages/AdminCategories'
 import AdminCustomers from './pages/Admin/pages/AdminCustomers'
 import { RequireAuth, RequireGuest, RequireRole } from './middleware/routeGuards'
-
+import Products from './pages/Products/Products'; 
+import Contact from './pages/Contact/Contact';
+import About from'./pages/About/About';
+import Categories from './pages/Categories/Categories';
 function App() {
   return (
     <Routes>
       <Route element={<WebsiteLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} /> 
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/categories" element={<Categories />} />
       </Route>
       <Route element={<RequireGuest />}>
         <Route path="/register" element={<Register />} />

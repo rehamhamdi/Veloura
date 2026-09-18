@@ -1,49 +1,54 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { AxiosError } from 'axios'
 import api from '../../services/api'
-import type { ApiErrorResponse, AuthResponse, AuthState, LoginPayload, RawAuthResponse, RegisterPayload, User, UserRole } from '../../types/auth'
+
+export type UserRole = 'user' | 'admin'
+
+export type User = {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
+type AuthResponse = {
+  token: string
+  user: User
+}
+
+type RegisterPayload = {
+  name: string
+  email: string
+  password: string
+}
+
+type LoginPayload = {
+  email: string
+  password: string
+}
+
+type ApiErrorResponse = {
+  message?: string
+  error?: string
+}
+
+type AuthState = {
+  user: User | null
+  token: string | null
+  isLoading: boolean
+  error: string | null
+}
 
 const initialState: AuthState = {
-  user: readStoredUser(),
+  user: null,
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
 }
 
-function readStoredUser(): User | null {
-  const storedUser = localStorage.getItem('user')
-
-  if (!storedUser) return null
-
-  try {
-    return JSON.parse(storedUser) as User
-  } catch {
-    localStorage.removeItem('user')
-    return null
-  }
-}
-
 function getErrorMessage(error: unknown) {
   const axiosError = error as AxiosError<ApiErrorResponse>
   return axiosError.response?.data?.message ?? axiosError.response?.data?.error ?? 'Something went wrong. Please try again.'
-}
-
-function normalizeAuthResponse(response: RawAuthResponse): AuthResponse {
-  let token = response.token ?? response.accessToken
-  let user = response.user
-
-  if (response.data && 'user' in response.data) {
-    token = response.data.token ?? response.data.accessToken ?? token
-    user = response.data.user
-  } else if (response.data) {
-    user = response.data as User
-  }
-
-  if (!token || !user) {
-    throw new Error('Login response is missing the token or user data.')
-  }
-
-  return { token, user: { ...user, role: user.role?.toLowerCase() as UserRole } }
 }
 
 export const registerUser = createAsyncThunk<void, RegisterPayload, { rejectValue: string }>(
@@ -61,8 +66,8 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginPayload, { rejectVa
   'auth/loginUser',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post<RawAuthResponse>('/auth/login', payload)
-      return normalizeAuthResponse(response.data)
+      const response = await api.post<AuthResponse>('/auth/login', payload)
+      return response.data
     } catch (error) {
       return rejectWithValue(getErrorMessage(error))
     }
@@ -77,7 +82,6 @@ const authSlice = createSlice({
       state.user = null
       state.token = null
       localStorage.removeItem('token')
-      localStorage.removeItem('user')
     },
     clearAuthError(state) {
       state.error = null
@@ -105,7 +109,6 @@ const authSlice = createSlice({
         state.user = action.payload.user
         state.token = action.payload.token
         localStorage.setItem('token', action.payload.token)
-        localStorage.setItem('user', JSON.stringify(action.payload.user))
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false

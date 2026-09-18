@@ -11,7 +11,8 @@ function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const dispatch = useAppDispatch()
-  const isAuthenticated = Boolean(useAppSelector((state) => state.auth.token))
+  const { token, user } = useAppSelector((state) => state.auth)
+  const isAuthenticated = Boolean(token)
   const { language, t, toggleLanguage } = useI18n()
 
   useEffect(() => {
@@ -73,7 +74,13 @@ function Navbar() {
               </div>
             )}
           </div> 
-          <Link className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" to="/login" aria-label={t('nav.account')}><UserRound size={18} strokeWidth={1.6} /></Link>
+          <Link
+            className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid"
+            to={!isAuthenticated ? '/login' : user?.role === 'admin' ? '/admin' : '/'}
+            aria-label={t('nav.account')}
+          >
+            <UserRound size={18} strokeWidth={1.6} />
+          </Link>
           {isAuthenticated && <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" onClick={handleLogout} aria-label={t('nav.logout')}><LogOut size={18} strokeWidth={1.6} /></button>}
           <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" onClick={toggleLanguage} aria-label={t('nav.language')}><Languages size={18} strokeWidth={1.6} /></button>
           <button className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc]" type="button" aria-label="Shopping bag"><ShoppingBag size={18} strokeWidth={1.6} /><span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#76504c] px-1 text-[9px] font-bold text-white">0</span></button>

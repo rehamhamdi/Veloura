@@ -1,7 +1,38 @@
+import { Link } from 'react-router-dom'
 import { products } from './adminData'
+import { useI18n } from '../../i18n/I18nProvider'
 
 function TopProducts() {
-  return <article className="rounded-[16px] border border-[#eaded5] bg-[#fffdf9] p-5 sm:p-6"><div className="flex items-center justify-between"><div><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[#9a7b52]" /><p className="m-0 text-sm font-bold text-[#493331]">Top products</p></div><p className="mb-0 mt-2 text-xs text-[#a38b83]">Your best sellers this month</p></div><button className="text-[11px] font-bold text-[#a86f6b] hover:text-[#6d4946]">View all</button></div><div className="mt-5 grid gap-1">{products.map((product, index) => <div key={product.name} className="flex items-center gap-3 border-b border-[#f3eae4] py-3 last:border-0"><span className="w-3 text-[10px] font-bold text-[#b9a39b]">0{index + 1}</span><img className="h-12 w-12 rounded-[10px] object-cover" src={product.image} alt="" /><div className="min-w-0 flex-1"><p className="m-0 truncate text-xs font-bold text-[#493331]">{product.name}</p><p className="m-0 mt-1 text-[10px] text-[#a38b83]">{product.category} · {product.sold}</p></div><p className="m-0 text-xs font-bold text-[#6d4946]">{product.revenue}</p></div>)}</div></article>
+  const { t } = useI18n()
+  return (
+    <article className="rounded-[16px] border border-[#eaded5] bg-[#fffdf9] p-5 sm:p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[#9a7b52]" />
+            <p className="m-0 text-sm font-bold text-[#493331]">{t('admin.topProducts') ?? 'Top products'}</p>
+          </div>
+          <p className="mb-0 mt-2 text-xs text-[#a38b83]">Your best sellers this month</p>
+        </div>
+        <Link to="/admin/products" className="text-[11px] font-bold text-[#a86f6b] hover:text-[#6d4946]">
+          {t('admin.viewAll') ?? 'View all'}
+        </Link>
+      </div>
+      <div className="mt-5 grid gap-1">
+        {products.map((product, index) => (
+          <div key={product.name} className="flex items-center gap-3 border-b border-[#f3eae4] py-3 last:border-0">
+            <span className="w-3 text-[10px] font-bold text-[#b9a39b]">0{index + 1}</span>
+            <img className="h-12 w-12 rounded-[10px] object-cover bg-[#eee3dc]" src={product.image} alt="" />
+            <div className="min-w-0 flex-1">
+              <p className="m-0 truncate text-xs font-bold text-[#493331]">{product.name}</p>
+              <p className="m-0 mt-1 text-[10px] text-[#a38b83]">{product.category} · {product.sold}</p>
+            </div>
+            <p className="m-0 text-xs font-bold text-[#6d4946]">{product.revenue}</p>
+          </div>
+        ))}
+      </div>
+    </article>
+  )
 }
 
-export default TopProducts
+export default TopProducts

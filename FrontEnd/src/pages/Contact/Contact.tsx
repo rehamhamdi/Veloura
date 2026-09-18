@@ -1,84 +1,186 @@
+import { useState } from 'react';
 import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import { ArrowRight} from 'lucide-react';
 export default function Contact() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    message: ''
+  });
+
+  const [errors, setErrors] = useState({
+    firstName: '',
+    email: '',
+    message: ''
+  });
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // مسح الإيرور بمجرد ما اليوزر يكتب
+    if (errors[name as keyof typeof errors]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    let newErrors = { firstName: '', email: '', message: '' };
+    let isValid = true;
+
+    // التحقق من الاسم الأول
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      isValid = false;
+    }
+
+    // التحقق من الإيميل
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    // التحقق من الرسالة
+    if (!formData.message.trim()) {
+      newErrors.message = 'Please enter your message';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+
+    if (isValid) {
+      // هنا المفروض نبعت الداتا للباك إند، بس مؤقتاً هنظهر رسالة النجاح
+      setIsSubmitted(true);
+      setFormData({ firstName: '', lastName: '', email: '', message: '' }); // تفريغ الفورمة
+      
+      // إخفاء رسالة النجاح بعد 5 ثواني
+      setTimeout(() => setIsSubmitted(false), 5000);
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#f8f3ed] px-6 py-12 lg:px-10 lg:py-16">
-      <div className="mx-auto max-w-[1160px]">
+    <main className="bg-[#f8f3ed] min-h-screen px-6 py-12 lg:px-10">
+      <div className="mx-auto max-w-[1100px]">
         
-        {/* 1. عنوان الصفحة وتحته خط رفيع شيك */}
-        <h1 className="mb-12 border-b border-[#eadcd2] pb-6 text-center font-['Playfair_Display'] text-4xl text-[#422f2c]">
-          Contact Us
-        </h1>
-        
-        {/* 2. الحاوية اللي هتقسم الصفحة نصين (عمودين على الكمبيوتر، وعمود واحد على الموبايل) */}
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
+        {/* عنوان الصفحة */}
+        <div className="text-center mb-16">
+          <h1 className="font-['Playfair_Display'] text-4xl lg:text-5xl text-[#422f2c]">Contact Us</h1>
+          <div className="h-px w-full bg-[#eadcd2] mt-10"></div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
           
-          {/* النص الأول: مكان الفورم */}
-          {/* ================= النص الأول: الفورم ================= */}
+          {/* العمود الأيسر: الفورمة */}
           <div>
-        <form className="flex flex-col gap-6">
-              
-              {/* حقل الاسم (أول وأخير) */}
+            {isSubmitted && (
+              <div className="mb-6 rounded-lg bg-green-50 p-4 text-green-800 border border-green-200">
+                Thank you! Your message has been sent successfully. We will get back to you soon.
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* حقل الاسم */}
               <div>
-                <label className="mb-2 block text-[13px] font-semibold text-[#5b4240]">Name <span className="text-red-500">*</span></label>
-                <div className="flex gap-4">
-                  <div className="w-1/2">
-                    <input type="text" placeholder="First name" className="box-border h-[50px] w-full rounded-[13px] border border-[#e3d2c8] bg-[#fffdf9] px-4 text-sm text-[#3b2a29] outline-none placeholder:text-[#b5a09a] focus:border-[#b9827e] focus:ring-[3px] focus:ring-[rgba(185,130,126,.15)]" required />
+                <label className="block text-sm font-medium text-[#422f2c] mb-2">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      name="firstName"
+                      placeholder="First name"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className={`w-full rounded-xl border ${errors.firstName ? 'border-red-500' : 'border-[#eadcd2]'} bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a86f6b]`}
+                    />
+                    {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                   </div>
-                  <div className="w-1/2">
-                    <input type="text" placeholder="Last name" className="box-border h-[50px] w-full rounded-[13px] border border-[#e3d2c8] bg-[#fffdf9] px-4 text-sm text-[#3b2a29] outline-none placeholder:text-[#b5a09a] focus:border-[#b9827e] focus:ring-[3px] focus:ring-[rgba(185,130,126,.15)]" required />
-                  </div>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full rounded-xl border border-[#eadcd2] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a86f6b]"
+                  />
                 </div>
               </div>
 
               {/* حقل الإيميل */}
               <div>
-                <label className="mb-2 block text-[13px] font-semibold text-[#5b4240]">Email address <span className="text-red-500">*</span></label>
-                <input type="email" placeholder="you@example.com" className="box-border h-[50px] w-full rounded-[13px] border border-[#e3d2c8] bg-[#fffdf9] px-4 text-sm text-[#3b2a29] outline-none placeholder:text-[#b5a09a] focus:border-[#b9827e] focus:ring-[3px] focus:ring-[rgba(185,130,126,.15)]" required />
+                <label className="block text-sm font-medium text-[#422f2c] mb-2">
+                  Email address <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full rounded-xl border ${errors.email ? 'border-red-500' : 'border-[#eadcd2]'} bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a86f6b]`}
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
 
               {/* حقل الرسالة */}
               <div>
-                <label className="mb-2 block text-[13px] font-semibold text-[#5b4240]">Comment or Message</label>
-                <textarea rows={5} placeholder="Your message here..." className="box-border w-full rounded-[13px] border border-[#e3d2c8] bg-[#fffdf9] p-4 text-sm text-[#3b2a29] outline-none placeholder:text-[#b5a09a] focus:border-[#b9827e] focus:ring-[3px] focus:ring-[rgba(185,130,126,.15)]"></textarea>
+                <label className="block text-sm font-medium text-[#422f2c] mb-2">
+                  Comment or Message
+                </label>
+                <textarea
+                  name="message"
+                  rows={5}
+                  placeholder="Your message here..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  className={`w-full rounded-xl border ${errors.message ? 'border-red-500' : 'border-[#eadcd2]'} bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a86f6b] resize-none`}
+                ></textarea>
+                {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
               </div>
 
               {/* زرار الإرسال */}
-              <button type="submit" className="mt-2 h-[50px] rounded-[13px] border-0 bg-[#6d4946] text-[13px] font-bold text-[#fffaf5] shadow-[0_8px_18px_rgba(109,73,70,.18)] transition hover:-translate-y-px hover:bg-[#583a38]">
-                Submit Message <span className="ml-2 text-[17px]" aria-hidden="true">→</span>
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#674d47] px-8 py-3.5 text-sm font-bold text-white transition hover:bg-[#523d38] w-full sm:w-auto"
+              >
+                Submit Message <ArrowRight size={18} />
               </button>
             </form>
           </div>
 
-         {/* ================= النص التاني: بيانات التواصل ================= */}
-          <div className="flex flex-col gap-10">
+          {/* العمود الأيمن: بيانات التواصل والروابط */}
+          <div className="space-y-10 lg:pl-10">
             
-            {/* الإيميل والواتساب */}
             <div>
-              <h2 className="mb-6 font-['Playfair_Display'] text-xl uppercase tracking-widest text-[#422f2c]">Contact</h2>
-              <div className="flex flex-col gap-4 text-[15px] text-[#493331]">
-                <p><span className="font-bold">Email:</span> glowtheraonlinetrading@gmail.com</p>
-                <p><span className="font-bold">Whatsapp:</span> 01103400746</p>
+              <h2 className="font-['Playfair_Display'] text-2xl tracking-widest text-[#422f2c] mb-6 uppercase">Contact</h2>
+              <div className="space-y-4 text-[#422f2c]">
+                <p><strong className="font-semibold">Email:</strong> velora@gmail.com</p>
+                <p><strong className="font-semibold">Whatsapp:</strong> 01103400746</p>
               </div>
             </div>
 
-            {/* روابط سريعة */}
             <div>
-              <h2 className="mb-5 font-['Playfair_Display'] text-xl font-bold text-[#422f2c]">Quick Links</h2>
-              <div className="flex flex-col gap-3 text-sm text-[#806967]">
-                <a href="#" className="transition hover:text-[#422f2c]">Privacy Policy</a>
-                <a href="#" className="transition hover:text-[#422f2c]">Refund and Returns Policy</a>
-                <a href="#" className="transition hover:text-[#422f2c]">Shipping & Delivery Policy</a>
-              </div>
+              <h2 className="font-['Playfair_Display'] text-2xl tracking-wide text-[#422f2c] mb-6">Quick Links</h2>
+              <ul className="space-y-4 text-sm text-[#735d58]">
+                <li><a href="#" className="hover:text-[#a86f6b] transition">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-[#a86f6b] transition">Refund and Returns Policy</a></li>
+                <li><a href="#" className="hover:text-[#a86f6b] transition">Shipping & Delivery Policy</a></li>
+              </ul>
             </div>
 
-           
-           {/* أيقونات السوشيال ميديا الحقيقية */}
-            <div className="flex gap-4">
-              <a href="#" className="text-[#422f2c] transition hover:text-[#a86f6b]">
-                <FaFacebook size={20} />
+            <div className="flex gap-4 pt-2">
+              <a href="#" className="text-[#422f2c] hover:text-[#a86f6b] transition">
+                <FaFacebook size={24} />
               </a>
-              <a href="#" className="text-[#422f2c] transition hover:text-[#a86f6b]">
-                <FaInstagram size={20} />
+              <a href="#" className="text-[#422f2c] hover:text-[#a86f6b] transition">
+                <FaInstagram size={24} />
               </a>
             </div>
 

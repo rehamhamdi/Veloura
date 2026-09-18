@@ -34,7 +34,7 @@ export default function About() {
     <main className="min-h-screen bg-[#f8f3ed] px-6 py-12 lg:px-10 lg:py-20">
       <div className="mx-auto max-w-[1160px]">
         
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid grid-cols-1 gap-12  lg:gap-16">
           
           {/* النص اللي على الشمال: رسالة الترحيب */}
           <div>

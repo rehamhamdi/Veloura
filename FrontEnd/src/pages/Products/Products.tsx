@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ShoppingBag, ChevronDown } from 'lucide-react';
-import { ChevronLeft, ChevronRight } from 'lucide-react'; 
+import { ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks'; // ضفنا useAppSelector
+import { addToCart, addToWishlist, removeFromWishlist } from '../../features/cart/cartSlice'; // ضفنا removeFromWishlist
 import '../../index.css'; 
 
 // داتا وهمية للمنتجات لحد ما نربط بالـ API
@@ -27,16 +28,14 @@ export default function Product() {
   const [filter, setFilter] = useState('All');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  
+  const dispatch = useAppDispatch();
+  // سحبنا المنتجات اللي في المفضلة من الريدكس
+  const wishlistItems = useAppSelector((state) => state.cart?.wishlistItems || []);
 
-  // فلترة المنتجات بناءً على الاختيار
   const filteredProducts = filter === 'All' ? allProducts : allProducts.filter(p => p.category === filter);
-  // 1. هنحدد عايزين كام منتج في الصفحة الواحدة (مثلاً 8)
   const itemsPerPage = 5;
-
-  // 2. نحسب عدد الصفحات الكلي بناءً على عدد المنتجات
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-
-  // 3. نقص المنتجات عشان ناخد الجزء الخاص بالصفحة اللي إحنا واقفين فيها بس
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
@@ -51,10 +50,7 @@ export default function Product() {
           </div>
           
           <div className="flex items-center gap-4">
-            {/* القايمة المخصصة (Custom Dropdown) */}
             <div className="relative">
-              
-              {/* الزرار اللي بيفتح ويقفل القايمة */}
               <button 
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-2 rounded-full border border-[#d8bbb0] bg-transparent px-5 py-2.5 text-sm font-medium text-[#76504c] outline-none transition hover:border-[#a86f6b] focus:border-[#a86f6b]"
@@ -63,20 +59,20 @@ export default function Product() {
                 <ChevronDown size={16} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* القايمة نفسها اللي بتنزل (بتظهر بس لو isDropdownOpen = true) */}
               {isDropdownOpen && (
                 <ul className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-[16px] border border-[#eadcd2] bg-[#fffdf9] p-2 shadow-[0_8px_24px_rgba(83,55,48,.12)]">
-                  {['All', 'Cleanse', 'Hydrate', 'Protect', 'Glow'].map((cat) => (
+                  {['All', 'Cleanse', 'Hydrate', 'Protect', 'Nourish', 'Exfoliate', 'Glow'].map((cat) => (
                     <li key={cat}>
                       <button
                         onClick={() => {
                           setFilter(cat);
-                          setIsDropdownOpen(false); // نقفل القايمة بعد الاختيار
+                          setIsDropdownOpen(false);
+                          setCurrentPage(1); // تصفير الصفحة لما نغير الفلتر
                         }}
                         className={`w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors ${
                           filter === cat
-                            ? 'bg-[#f1e3dc] font-bold text-[#422f2c]' // لون العنصر النشط
-                            : 'text-[#735d58] hover:bg-[#faf6f0] hover:text-[#422f2c]' // لون العناصر العادية
+                            ? 'bg-[#f1e3dc] font-bold text-[#422f2c]'
+                            : 'text-[#735d58] hover:bg-[#faf6f0] hover:text-[#422f2c]'
                         }`}
                       >
                         {cat === 'All' ? 'All Products' : cat}
@@ -85,47 +81,80 @@ export default function Product() {
                   ))}
                 </ul>
               )}
-              
             </div>
           </div>
         </div>
 
         {/* شبكة المنتجات */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-          {displayedProducts.map((product) => (
-            <article key={product.id} className="group cursor-pointer flex flex-col">
-              {/* صورة المنتج */}
-              <div className="relative h-[320px] mb-4 overflow-hidden rounded-[20px] bg-[#e9d2c5]">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                {/* زرار الإضافة للسلة بيظهر لما نعمل Hover */}
-                <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+          {displayedProducts.map((product) => {
+            // بنشيك هل المنتج ده في المفضلة ولا لأ
+            const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+
+            return (
+              <article key={product.id} className="group cursor-pointer flex flex-col">
+                <div className="relative h-[320px] mb-4 overflow-hidden rounded-[20px] bg-[#e9d2c5]">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  
+                  {/* زرار الإضافة للسلة */}
+                  <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                    <button 
+                      className="w-full flex items-center justify-center gap-2 bg-[#fffaf5]/90 backdrop-blur-sm text-[#422f2c] font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:bg-[#422f2c] hover:text-white transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation(); // عشان الكارد ميعملش كليك بالغلط
+                        dispatch(addToCart({
+                          id: product.id,
+                          name: product.name, 
+                          price: product.price
+                        }))
+                      }}
+                    >
+                      <ShoppingBag size={16} />
+                      Add to Cart
+                    </button>
+                  </div>
+
+                  {/* زرار الإضافة للمفضلة مع تغيير اللون */}
                   <button 
-                    className="w-full flex items-center justify-center gap-2 bg-[#fffaf5]/90 backdrop-blur-sm text-[#422f2c] font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:bg-[#422f2c] hover:text-white transition-colors"
-                    onClick={() => alert(`Added ${product.name} to cart!`)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isWishlisted) {
+                        dispatch(removeFromWishlist(product.id));
+                      } else {
+                        dispatch(addToWishlist({
+                          id: product.id,
+                          name: product.name,
+                          price: product.price
+                        }));
+                      }
+                    }}
+                    className={`absolute top-3 right-3 z-10 rounded-full p-2 transition ${
+                      isWishlisted 
+                        ? 'bg-red-50 text-red-500' // أحمر لو متضاف
+                        : 'bg-white/80 text-[#a86f6b] hover:bg-[#f1e3dc]' // عادي لو مش متضاف
+                    }`}
                   >
-                    <ShoppingBag size={16} />
-                    Add to Cart
+                    <Heart size={22} className={isWishlisted ? 'fill-current' : ''} />
                   </button>
                 </div>
-              </div>
-              
-              {/* تفاصيل المنتج */}
-              <div className="flex flex-col flex-grow">
-                <p className="text-[10px] uppercase tracking-[.15em] text-[#a86f6b] mb-1">{product.category}</p>
-                <h3 className="font-['Playfair_Display'] text-lg text-[#493331] mb-1">{product.name}</h3>
-                <p className="font-medium text-[#76504c] mt-auto">${product.price}</p>
-              </div>
-            </article>
-          ))}
+                
+                <div className="flex flex-col flex-grow">
+                  <p className="text-[10px] uppercase tracking-[.15em] text-[#a86f6b] mb-1">{product.category}</p>
+                  <h3 className="font-['Playfair_Display'] text-lg text-[#493331] mb-1">{product.name}</h3>
+                  <p className="font-medium text-[#76504c] mt-auto">${product.price}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
-        {totalPages > 1 && ( // السطر ده بيخفي الترقيم لو المنتجات كلها مكفية صفحة واحدة
+
+        {/* الترقيم (Pagination) */}
+        {totalPages > 1 && (
           <div className="mt-16 flex items-center justify-center gap-2">
-            
-            {/* زرار السابق */}
             <button 
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d8bbb0] text-[#76504c] transition-colors hover:bg-[#f1e3dc] disabled:opacity-50 disabled:hover:bg-transparent"
@@ -134,7 +163,6 @@ export default function Product() {
               <ChevronLeft size={20} />
             </button>
 
-            {/* أرقام الصفحات الحقيقية */}
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
@@ -149,7 +177,6 @@ export default function Product() {
               </button>
             ))}
 
-            {/* زرار التالي */}
             <button 
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d8bbb0] text-[#76504c] transition-colors hover:bg-[#f1e3dc] disabled:opacity-50 disabled:hover:bg-transparent"
@@ -157,7 +184,6 @@ export default function Product() {
             >
               <ChevronRight size={20} />
             </button>
-            
           </div>
         )}
       </div>

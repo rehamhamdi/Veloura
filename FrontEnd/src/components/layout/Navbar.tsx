@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Languages, LogOut, Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react'
+import { Languages, LogOut, Menu, Search, ShoppingBag, UserRound, X,Heart } from 'lucide-react'
 import { logout } from '../../features/auth/authSlice'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { useI18n } from '../../i18n/I18nProvider'
@@ -12,6 +12,8 @@ function Navbar() {
 
   const dispatch = useAppDispatch()
   const isAuthenticated = Boolean(useAppSelector((state) => state.auth.token))
+  const cartItems = useAppSelector((state) => state.cart?.cartItems || [])
+  const wishlistItems = useAppSelector((state) => state.cart?.wishlistItems || [])
   const { language, t, toggleLanguage } = useI18n()
 
   useEffect(() => {
@@ -76,7 +78,15 @@ function Navbar() {
           <Link className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" to="/login" aria-label={t('nav.account')}><UserRound size={18} strokeWidth={1.6} /></Link>
           {isAuthenticated && <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" onClick={handleLogout} aria-label={t('nav.logout')}><LogOut size={18} strokeWidth={1.6} /></button>}
           <button className="hidden h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] sm:grid" type="button" onClick={toggleLanguage} aria-label={t('nav.language')}><Languages size={18} strokeWidth={1.6} /></button>
-          <button className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc]" type="button" aria-label="Shopping bag"><ShoppingBag size={18} strokeWidth={1.6} /><span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#76504c] px-1 text-[9px] font-bold text-white">0</span></button>
+          <Link to="/cart" className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc]" type="button" aria-label="Shopping bag">
+          <ShoppingBag size={18} strokeWidth={1.6} />
+          <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-[#76504c] px-1 text-[9px] font-bold text-white">
+            {cartItems.length}
+          </span>
+          </Link>     
+          <Link to="/wishlist" className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc]" aria-label="Wishlist">
+          <Heart size={22} strokeWidth={1.6} />
+          </Link>     
           <button className="grid h-10 w-10 place-items-center rounded-full transition hover:bg-[#f1e3dc] lg:hidden" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>{menuOpen ? <X size={21} strokeWidth={1.6} /> : <Menu size={21} strokeWidth={1.6} />}</button>
         </div>
       </nav>

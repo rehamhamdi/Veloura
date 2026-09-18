@@ -12,7 +12,7 @@ using Veloura.Application.Features.Auth.GetMe;
 
 namespace Veloura.API.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Buyer")]
 [ApiController]
 [Route("api/account")]
 public class AccountController : ControllerBase

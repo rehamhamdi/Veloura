@@ -32,6 +32,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserRepository, EfUserRepository>();
         services.AddScoped<IAddressRepository, EfAddressRepository>();
+        services.AddScoped<IContactMessageRepository, EfContactMessageRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUserRepository, EfUserRepository>();

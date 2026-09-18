@@ -2,18 +2,32 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { AxiosError } from 'axios'
 import api from '../../services/api'
 
-export type UserRole = 'user' | 'admin'
+export type UserRole = 'user' | 'buyer' | 'customer' | 'admin'
 
 export type User = {
   id: string
   name: string
-  email: string
+  email?: string
   role: UserRole
 }
 
 type AuthResponse = {
   token: string
   user: User
+}
+
+type LoginApiResponse = {
+  succeeded: boolean
+  data?: {
+    token?: string
+    user?: {
+      id?: string | number
+      name?: string
+      email?: string
+      role?: string
+    }
+  }
+  message?: string
 }
 
 type RegisterPayload = {
@@ -39,8 +53,81 @@ type AuthState = {
   error: string | null
 }
 
+function normalizeLoginResponse(response: LoginApiResponse): AuthResponse {
+  const token = response.data?.token
+  const apiUser = response.data?.user
+
+  if (!token || !apiUser) {
+    throw new Error(response.message ?? 'Login response is missing user data.')
+  }
+
+  return {
+    token,
+    user: {
+      id: String(apiUser.id ?? ''),
+      name: apiUser.name ?? '',
+      email: apiUser.email,
+      role: (apiUser.role ?? 'user').toLowerCase() as UserRole,
+    },
+  }
+}
+
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1]
+    if (!base64Url) return null
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch {
+    return null
+  }
+}
+
+function getInitialUser(): User | null {
+  try {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      return JSON.parse(storedUser) as User
+    }
+    const token = localStorage.getItem('token')
+    if (token) {
+      const decoded = parseJwt(token)
+      if (decoded) {
+        const role =
+          decoded.role ||
+          decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+          'user'
+        const name =
+          decoded.name ||
+          decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+          decoded.email ||
+          'User'
+        const email =
+          decoded.email ||
+          decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+        const id = decoded.nameid || decoded.sub || String(decoded.id ?? '')
+        return {
+          id,
+          name,
+          email,
+          role: String(role).toLowerCase() as UserRole,
+        }
+      }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
+
 const initialState: AuthState = {
-  user: null,
+  user: getInitialUser(),
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
@@ -66,8 +153,8 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginPayload, { rejectVa
   'auth/loginUser',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post<AuthResponse>('/auth/login', payload)
-      return response.data
+      const response = await api.post<LoginApiResponse>('/auth/login', payload)
+      return normalizeLoginResponse(response.data)
     } catch (error) {
       return rejectWithValue(getErrorMessage(error))
     }
@@ -82,6 +169,7 @@ const authSlice = createSlice({
       state.user = null
       state.token = null
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
     },
     clearAuthError(state) {
       state.error = null
@@ -109,6 +197,7 @@ const authSlice = createSlice({
         state.user = action.payload.user
         state.token = action.payload.token
         localStorage.setItem('token', action.payload.token)
+        localStorage.setItem('user', JSON.stringify(action.payload.user))
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false

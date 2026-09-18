@@ -1,47 +1,87 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../../store/hooks'; // ضفنا useAppSelector
-import { addToCart, addToWishlist, removeFromWishlist } from '../../features/cart/cartSlice'; // ضفنا removeFromWishlist
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { addToCart, addToWishlist, removeFromWishlist } from '../../features/cart/cartSlice';
+import api from '../../services/api';
 import '../../index.css'; 
 
-// داتا وهمية للمنتجات لحد ما نربط بالـ API
-const allProducts = [
-  { id: 1, name: 'Purifying Cleanser', price: 28, category: 'Cleanse', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=700&q=85' },
-  { id: 2, name: 'Deep Hydration Serum', price: 45, category: 'Hydrate', image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=700&q=85' },
-  { id: 3, name: 'Daily Sun Shield SPF 30', price: 32, category: 'Protect', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9b9f8?auto=format&fit=crop&w=700&q=85' },
-  { id: 4, name: 'Night Repair Cream', price: 55, category: 'Nourish', image: 'https://images.unsplash.com/photo-1615397323190-25e2e850b555?auto=format&fit=crop&w=700&q=85' },
-  { id: 5, name: 'Gentle Exfoliator', price: 24, category: 'Exfoliate', image: 'https://images.unsplash.com/photo-1629198725876-8051878b27dd?auto=format&fit=crop&w=700&q=85' },
-  { id: 6, name: 'Radiance Face Oil', price: 48, category: 'Glow', image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=700&q=85' },
-  { id: 7, name: 'Balancing Toner', price: 22, category: 'Cleanse', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
-  { id: 8, name: 'Vitamin C Boost', price: 38, category: 'Glow', image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=700&q=85' },
-  { id: 9, name: 'Purifying Cleanser', price: 28, category: 'Cleanse', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=700&q=85' },
-  { id: 10, name: 'Deep Hydration Serum', price: 45, category: 'Hydrate', image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=700&q=85' },
-  { id: 11, name: 'Daily Sun Shield SPF 30', price: 32, category: 'Protect', image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9b9f8?auto=format&fit=crop&w=700&q=85' },
-  { id: 12, name: 'Night Repair Cream', price: 55, category: 'Nourish', image: 'https://images.unsplash.com/photo-1615397323190-25e2e850b555?auto=format&fit=crop&w=700&q=85' },
-  { id: 13, name: 'Gentle Exfoliator', price: 24, category: 'Exfoliate', image: 'https://images.unsplash.com/photo-1629198725876-8051878b27dd?auto=format&fit=crop&w=700&q=85' },
-  { id: 14, name: 'Radiance Face Oil', price: 48, category: 'Glow', image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=700&q=85' },
-  { id: 15, name: 'Balancing Toner', price: 22, category: 'Cleanse', image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
-  { id: 16, name: 'Vitamin C Boost', price: 38, category: 'Glow', image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=700&q=85' },
-];
+// شكل الداتا الحقيقية اللي راجعة من الباك إند
+interface Product {
+  id: number;
+  title: string; 
+  price: number;
+  description: string;
+  category: string;
+  images?: { id: number; url: string }[];
+}
 
 export default function Product() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [filter, setFilter] = useState('All');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   
   const dispatch = useAppDispatch();
-  // سحبنا المنتجات اللي في المفضلة من الريدكس
   const wishlistItems = useAppSelector((state) => state.cart?.wishlistItems || []);
 
-  const filteredProducts = filter === 'All' ? allProducts : allProducts.filter(p => p.category === filter);
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  // 1. جلب الداتا من الباك إند أول ما الصفحة تفتح
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get('Product');
+        
+        // السطر ده هيطبع شكل الداتا في الكونسول عشان نشوفها
+        console.log("Backend Response:", response.data);
+        
+        // كود ذكي بيحاول يقرأ الداتا بكذا شكل محتمل من ASP.NET
+        if (Array.isArray(response.data)) {
+          setProducts(response.data); // لو راجعة مباشرة
+        } else if (response.data && Array.isArray(response.data.data)) {
+          setProducts(response.data.data); // لو متغلفة في data
+        } else if (response.data && Array.isArray(response.data.$values)) {
+          setProducts(response.data.$values); // لو الباك إند مفعل الـ Preserve References
+        } else {
+          console.warn("Couldn't find the products array in the response");
+        }
+
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // 2. الفلترة بتتم على الداتا الحقيقية (products) بدل الداتا الوهمية
+  const filteredProducts = filter === 'All' ? products : products.filter(p => p.category === filter);
+  
+  // 3. الترقيم
+  const itemsPerPage = 8; // عرض 8 منتجات في الصفحة
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+
+  // صورة افتراضية لو الباك إند مرجعش صور للمنتج
+  const defaultImage = 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=700&q=85';
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f3ed]">
+        <div className="text-2xl font-['Playfair_Display'] text-[#79504b] animate-pulse">
+          Loading Collection...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="bg-[#f8f3ed] min-h-screen px-6 py-12 lg:px-10 lg:py-16">
       <div className="mx-auto max-w-[1320px]">
+        
         {/* الهيدر والفلتر */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
           <div>
@@ -61,13 +101,14 @@ export default function Product() {
 
               {isDropdownOpen && (
                 <ul className="absolute right-0 top-full z-50 mt-2 w-44 overflow-hidden rounded-[16px] border border-[#eadcd2] bg-[#fffdf9] p-2 shadow-[0_8px_24px_rgba(83,55,48,.12)]">
-                  {['All', 'Cleanse', 'Hydrate', 'Protect', 'Nourish', 'Exfoliate', 'Glow'].map((cat) => (
+                  {/* الفئات بناءً على الداتا اللي راجعة */}
+                  {['All', 'Cleansers', 'Serums', 'Moisturizers', 'Sunscreen', 'Exfoliators', 'Eye Care', 'Lip Care'].map((cat) => (
                     <li key={cat}>
                       <button
                         onClick={() => {
                           setFilter(cat);
                           setIsDropdownOpen(false);
-                          setCurrentPage(1); // تصفير الصفحة لما نغير الفلتر
+                          setCurrentPage(1); 
                         }}
                         className={`w-full rounded-xl px-4 py-2.5 text-left text-sm transition-colors ${
                           filter === cat
@@ -85,72 +126,77 @@ export default function Product() {
           </div>
         </div>
 
-        {/* شبكة المنتجات */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
-          {displayedProducts.map((product) => {
-            // بنشيك هل المنتج ده في المفضلة ولا لأ
-            const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+        {/* شبكة المنتجات الحقيقية */}
+        {displayedProducts.length === 0 ? (
+           <div className="text-center py-20 text-lg text-[#735d58]">
+             No products found in this category.
+           </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+            {displayedProducts.map((product) => {
+              const isWishlisted = wishlistItems.some((item) => item.id === product.id);
 
-            return (
-              <article key={product.id} className="group cursor-pointer flex flex-col">
-                <div className="relative h-[320px] mb-4 overflow-hidden rounded-[20px] bg-[#e9d2c5]">
-                  <img 
-                    src={product.image} 
-                    alt={product.name} 
+              return (
+                <article key={product.id} className="group cursor-pointer flex flex-col">
+                  <div className="relative h-[320px] mb-4 overflow-hidden rounded-[20px] bg-[#e9d2c5]">
+                    <img 
+                    src={product.images && product.images.length > 0 ? product.images[0].url : defaultImage} 
+                    alt={product.title} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  
-                  {/* زرار الإضافة للسلة */}
-                  <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                    />
+                    
+                    {/* الإضافة للسلة */}
+                    <div className="absolute inset-x-0 bottom-0 p-4 opacity-0 translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">
+                      <button 
+                        className="w-full flex items-center justify-center gap-2 bg-[#fffaf5]/90 backdrop-blur-sm text-[#422f2c] font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:bg-[#422f2c] hover:text-white transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch(addToCart({
+                            id: product.id,
+                            name: product.title, 
+                            price: product.price
+                          }))
+                        }}
+                      >
+                        <ShoppingBag size={16} />
+                        Add to Cart
+                      </button>
+                    </div>
+
+                    {/* الإضافة للمفضلة */}
                     <button 
-                      className="w-full flex items-center justify-center gap-2 bg-[#fffaf5]/90 backdrop-blur-sm text-[#422f2c] font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl hover:bg-[#422f2c] hover:text-white transition-colors"
                       onClick={(e) => {
-                        e.stopPropagation(); // عشان الكارد ميعملش كليك بالغلط
-                        dispatch(addToCart({
-                          id: product.id,
-                          name: product.name, 
-                          price: product.price
-                        }))
+                        e.stopPropagation();
+                        if (isWishlisted) {
+                          dispatch(removeFromWishlist(product.id));
+                        } else {
+                          dispatch(addToWishlist({
+                            id: product.id,
+                            name: product.title,
+                            price: product.price
+                          }));
+                        }
                       }}
+                      className={`absolute top-3 right-3 z-10 rounded-full p-2 transition ${
+                        isWishlisted 
+                          ? 'bg-red-50 text-red-500' 
+                          : 'bg-white/80 text-[#a86f6b] hover:bg-[#f1e3dc]'
+                      }`}
                     >
-                      <ShoppingBag size={16} />
-                      Add to Cart
+                      <Heart size={22} className={isWishlisted ? 'fill-current' : ''} />
                     </button>
                   </div>
-
-                  {/* زرار الإضافة للمفضلة مع تغيير اللون */}
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isWishlisted) {
-                        dispatch(removeFromWishlist(product.id));
-                      } else {
-                        dispatch(addToWishlist({
-                          id: product.id,
-                          name: product.name,
-                          price: product.price
-                        }));
-                      }
-                    }}
-                    className={`absolute top-3 right-3 z-10 rounded-full p-2 transition ${
-                      isWishlisted 
-                        ? 'bg-red-50 text-red-500' // أحمر لو متضاف
-                        : 'bg-white/80 text-[#a86f6b] hover:bg-[#f1e3dc]' // عادي لو مش متضاف
-                    }`}
-                  >
-                    <Heart size={22} className={isWishlisted ? 'fill-current' : ''} />
-                  </button>
-                </div>
-                
-                <div className="flex flex-col flex-grow">
-                  <p className="text-[10px] uppercase tracking-[.15em] text-[#a86f6b] mb-1">{product.category}</p>
-                  <h3 className="font-['Playfair_Display'] text-lg text-[#493331] mb-1">{product.name}</h3>
-                  <p className="font-medium text-[#76504c] mt-auto">${product.price}</p>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                  
+                  <div className="flex flex-col flex-grow">
+                    <p className="text-[10px] uppercase tracking-[.15em] text-[#a86f6b] mb-1">{product.category}</p>
+                    <h3 className="font-['Playfair_Display'] text-lg text-[#493331] mb-1">{product.title}</h3>
+                    <p className="font-medium text-[#76504c] mt-auto">${product.price.toFixed(2)}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
 
         {/* الترقيم (Pagination) */}
         {totalPages > 1 && (

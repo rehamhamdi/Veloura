@@ -1,121 +1,91 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import api from '../../services/api';
 
-// داتا الأقسام (زودناها لـ 8 أقسام بدل 4)
-const categoriesData = [
-  {
-    id: 1,
-    name: 'Cleanse',
-    description: 'Start your routine with gentle cleansers.',
-    image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=600&q=85',
-    itemCount: 4,
-  },
-  {
-    id: 2,
-    name: 'Hydrate',
-    description: 'Quench skin’s thirst with nourishing serums.',
-    image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=600&q=85',
-    itemCount: 6,
-  },
-  {
-    id: 3,
-    name: 'Protect',
-    description: 'Shield skin from environmental stressors.',
-    image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9b9f8?auto=format&fit=crop&w=600&q=85',
-    itemCount: 3,
-  },
-  {
-    id: 4,
-    name: 'Glow',
-    description: 'Enhance your natural beauty and radiance.',
-    image: 'https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=600&q=85',
-    itemCount: 5,
-  },
-  {
-    id: 5,
-    name: 'Treat',
-    description: 'Potent formulas for specific skin concerns.',
-    image: 'https://images.unsplash.com/photo-1615397323190-25e2e850b555?auto=format&fit=crop&w=600&q=85',
-    itemCount: 7,
-  },
-  {
-    id: 6,
-    name: 'Masks',
-    description: 'Deep cleansing and hydrating weekly rituals.',
-    image: 'https://images.unsplash.com/photo-1629198725876-8051878b27dd?auto=format&fit=crop&w=600&q=85',
-    itemCount: 4,
-  },
-  {
-    id: 7,
-    name: 'Body Care',
-    description: 'Luxurious hydration for your entire body.',
-    image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=600&q=85',
-    itemCount: 8,
-  },
-  {
-    id: 8,
-    name: 'Tools',
-    description: 'Facial rollers and sculpting massage tools.',
-    image: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=600&q=85',
-    itemCount: 3,
-  }
-];
+// دي شكل الداتا المبدئية للقسم، هنعدلها لو الباك إند مسمي الحقول حاجة تانية
+interface Category {
+  id: number;
+  name: string; // ممكن تكون title في الباك إند
+  description?: string;
+  image?: string; // أو ممكن تكون مصفوفة زي المنتجات
+}
 
 export default function Categories() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // شيكي في الـ Swagger لو اسم الـ Endpoint مختلف عن Category
+        const response = await api.get('Category'); 
+        
+        // طبعنا الداتا هنا عشان لو الصور مظهرتش، نفتح الكونسول ونشوف مسارها
+        console.log("Categories Response:", response.data);
+
+        if (Array.isArray(response.data)) {
+          setCategories(response.data);
+        } else if (response.data && Array.isArray(response.data.data)) {
+          setCategories(response.data.data);
+        } else if (response.data && Array.isArray(response.data.$values)) {
+          setCategories(response.data.$values);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f3ed]">
+        <div className="text-2xl font-['Playfair_Display'] text-[#79504b] animate-pulse">
+          Loading Categories...
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-[#f8f3ed] px-6 py-12 lg:px-10 lg:py-20">
+    <main className="bg-[#f8f3ed] min-h-screen px-6 py-12 lg:px-10 lg:py-16">
       <div className="mx-auto max-w-[1320px]">
         
-        {/* عنوان الصفحة */}
-        <div className="mb-12 text-center">
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-[.2em] text-[#a86f6b]">
-            Explore by Need
-          </p>
-          <h1 className="font-['Playfair_Display'] text-4xl text-[#422f2c] sm:text-5xl">
-            Shop by Category
-          </h1>
+        <div className="text-center mb-16">
+          <h1 className="font-['Playfair_Display'] text-4xl lg:text-5xl text-[#422f2c] mb-4">Shop by Category</h1>
+          <p className="text-[#806967] text-sm max-w-md mx-auto">Explore our curated collections for your specific skincare needs.</p>
         </div>
 
-        {/* شبكة الأقسام بعد التعديل (4 أعمدة) */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {categoriesData.map((category) => (
-            <Link 
-              to="/products" 
-              key={category.id}
-              // صغرنا الارتفاع هنا لـ 320 بيكسل
-              className="group relative flex h-[280px] w-full flex-col justify-end overflow-hidden rounded-[20px] bg-[#e9d2c5] p-6 text-white sm:h-[320px]"
-            >
-              <img 
-                src={category.image} 
-                alt={category.name}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
-              />
-              
-              <div className="absolute inset-0 bg-gradient-to-t from-[#3b2a29]/90 via-[#3b2a29]/30 to-transparent transition-opacity duration-500 group-hover:opacity-95" />
-
-              <div className="relative z-10 translate-y-6 transition-transform duration-500 group-hover:translate-y-0">
-                <span className="mb-2 inline-block rounded-full bg-[#fffaf5]/20 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider backdrop-blur-md">
-                  {category.itemCount} Products
-                </span>
-                
-                {/* صغرنا حجم الخط هنا لـ 2xl */}
-                <h2 className="mb-2 font-['Playfair_Display'] text-2xl font-medium sm:text-3xl">
-                  {category.name}
-                </h2>
-                
-                {/* صغرنا الوصف وخليناه سطرين بس */}
-                <p className="mb-5 max-w-[95%] text-xs text-[#f8e9e1] opacity-0 transition-opacity duration-500 group-hover:opacity-100 line-clamp-2">
-                  {category.description}
-                </p>
-                
-                <div className="flex items-center gap-2 text-xs font-bold text-[#f3d9d0]">
-                  Explore <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+        {categories.length === 0 ? (
+          <div className="text-center py-20 text-lg text-[#735d58]">
+            No categories found.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+            {categories.map((category) => (
+              <Link 
+                to="/products" // ممكن بعدين نعدلها تفلتر المنتجات بالقسم ده
+                key={category.id} 
+                className="group cursor-pointer flex flex-col items-center text-center"
+              >
+                <div className="relative w-full h-[350px] mb-6 overflow-hidden rounded-[24px] bg-[#e9d2c5]">
+                  <img 
+                    // لو مسار الصورة راجع Object زي المنتجات، هنعدل السطر ده
+                    src={category.image || 'https://images.unsplash.com/photo-1615397323190-25e2e850b555?auto=format&fit=crop&w=700&q=80'} 
+                    alt={category.name} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
+                <h3 className="font-['Playfair_Display'] text-2xl text-[#493331] transition-colors group-hover:text-[#a86f6b]">
+                  {category.name}
+                </h3>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );

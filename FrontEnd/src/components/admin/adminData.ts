@@ -1,11 +1,11 @@
-import { Grid2X2, LayoutDashboard, Package, ShoppingBag, Store, Users } from 'lucide-react'
+import { Grid2X2, LayoutDashboard, Mail, Package, ShoppingBag, Store, Users } from 'lucide-react'
 
 export const navigation = [
   { label: 'Dashboard', icon: LayoutDashboard },
   { label: 'Products', icon: Package },
   { label: 'Categories', icon: Grid2X2 },
   { label: 'Orders', icon: ShoppingBag },
-  { label: 'Customers', icon: Users },
+  { label: 'Contacts', icon: Mail },
 ]
 
 export const stats = [

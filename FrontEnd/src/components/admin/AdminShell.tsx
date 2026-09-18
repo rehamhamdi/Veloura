@@ -15,7 +15,7 @@ function AdminShell({ activeItem, children }: AdminShellProps) {
     if (item === 'Orders') navigate('/admin/orders')
     if (item === 'Products') navigate('/admin/products')
     if (item === 'Categories') navigate('/admin/categories')
-    if (item === 'Customers') navigate('/admin/customers')
+    if (item === 'Contacts' || item === 'Customers') navigate('/admin/contacts')
     if (item === 'Dashboard') navigate('/admin')
   }
 

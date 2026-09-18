@@ -15,12 +15,16 @@ import Products from './pages/Products/Products';
 import Contact from './pages/Contact/Contact';
 import About from'./pages/About/About';
 import Categories from './pages/Categories/Categories';
+import Cart from './pages/Cart/Cart';
+import Wishlist from './pages/Wishlist/Wishlist'
 function App() {
   return (
     <Routes>
       <Route element={<WebsiteLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} /> 
+        <Route path="/cart" element={<Cart />} /> 
+        <Route path="/wishlist" element={<Wishlist />} /> 
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
         <Route path="/categories" element={<Categories />} />

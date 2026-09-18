@@ -25,6 +25,7 @@ export default function ShopSection() {
   };
 
   return (
+    
     <section id="shop" className="border-y border-[#eadcd2] bg-[#f2e6de] px-6 py-16 lg:px-10 lg:py-20 overflow-hidden">
       <div className="mx-auto flex max-w-[1160px] flex-col justify-between gap-7 sm:flex-row sm:items-end">
         <div>

@@ -26,10 +26,18 @@ public class OrdersController : ControllerBase
         int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
     [HttpPost("checkout")]
-    public async Task<IActionResult> Checkout([FromBody] CheckoutRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Checkout(
+    [FromBody] CheckoutRequest request,
+    CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
-            new CheckoutCommand(CurrentUserId, request.ShippingAddressId, request.PaymentMethod), cancellationToken);
+            new CheckoutCommand(
+                CurrentUserId,
+                request.ShippingAddressId,
+                request.PaymentMethod,
+                request.DiscountCode),
+            cancellationToken);
+
         return StatusCode((int)response.StatusCode, response);
     }
 

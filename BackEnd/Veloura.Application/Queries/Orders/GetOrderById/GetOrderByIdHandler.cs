@@ -39,6 +39,9 @@ public class GetOrderByIdHandler : IRequestHandler<GetOrderByIdQuery, Response<O
             Status = order.Status,
             PaymentMethod = order.PaymentMethod,
             Total = order.Total,
+            Subtotal = order.Subtotal,
+            DiscountCode = order.DiscountCode,
+            DiscountAmount = order.DiscountAmount,
             ShippingAddress = new AddressDto
             {
                 Label = order.ShippingAddress.Label,

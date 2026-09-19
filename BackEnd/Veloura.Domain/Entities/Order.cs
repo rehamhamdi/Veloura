@@ -22,5 +22,4 @@ public class Order : BaseEntity
         public User User { get; set; } = default!;
         public Address ShippingAddress { get; set; } = default!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    }
 }

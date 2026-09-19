@@ -16,6 +16,7 @@ namespace Veloura.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
+        public Payment? Payment { get; set; }
         public User User { get; set; } = default!;
         public Address ShippingAddress { get; set; } = default!;
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

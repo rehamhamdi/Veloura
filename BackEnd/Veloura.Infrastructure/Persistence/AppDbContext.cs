@@ -20,6 +20,8 @@ namespace Veloura.Infrastructure.Persistence
         public DbSet<CartItem> CartItems => Set<CartItem>();
         public DbSet<WishlistItem> WishlistItems => Set<WishlistItem>();
         public DbSet<Order> Orders => Set<Order>();
+
+        public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
 

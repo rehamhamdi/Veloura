@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Veloura.Application.Commands.Wishlist.AddWishlistItem;
 using Veloura.Application.Commands.Wishlist.RemoveWishlistItem;
@@ -18,6 +19,7 @@ namespace Veloura.API.Controllers
             _mediator = mediator;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetWishlist(int userId)
         {
@@ -27,6 +29,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddToWishlist(
             AddWishlistItemCommand command)
@@ -35,7 +38,7 @@ namespace Veloura.API.Controllers
 
             return StatusCode((int)result.StatusCode, result);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         public async Task<IActionResult> RemoveFromWishlist(
             RemoveWishlistItemCommand command)

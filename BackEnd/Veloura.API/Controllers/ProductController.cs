@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Veloura.Application.Commands.Product.CreateProduct;
 using Veloura.Application.Commands.Product.DeleteProduct;
@@ -20,7 +21,9 @@ namespace Veloura.API.Controllers
             _mediator = mediator;
         }
 
-        
+
+
+        [Authorize(Roles = "Buyer,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
@@ -29,7 +32,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        
+        [Authorize(Roles = "Buyer,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -39,6 +42,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateProduct(
             CreateProductCommand command)
@@ -48,7 +52,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(
             int id,
@@ -61,7 +65,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

@@ -10,7 +10,7 @@ function AdminSidebar({ open, activeItem, onClose, onSelect }: AdminSidebarProps
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const { direction, language, t, toggleLanguage } = useI18n()
-  const labels: Record<string, string> = { Dashboard: t('admin.dashboard'), Products: t('admin.products'), Categories: t('admin.categories'), Orders: t('admin.orders'), Contacts: t('admin.contacts'), Customers: t('admin.contacts') }
+  const labels: Record<string, string> = { Dashboard: t('admin.dashboard'), Products: t('admin.products'), Categories: t('admin.categories'), Discounts: t('admin.discounts'), Orders: t('admin.orders'), Contacts: t('admin.contacts'), Customers: t('admin.contacts') }
 
   function handleLogout() {
     dispatch(logout())

@@ -14,7 +14,7 @@ function AdminShell({ activeItem, children }: AdminShellProps) {
     setSidebarOpen(false)
     if (item === 'Orders') navigate('/admin/orders')
     if (item === 'Products') navigate('/admin/products')
-    if (item === 'Categories') navigate('/admin/categories')
+    if (item === 'Discounts' || item === 'Categories') navigate('/admin/discounts')
     if (item === 'Contacts' || item === 'Customers') navigate('/admin/contacts')
     if (item === 'Dashboard') navigate('/admin')
   }

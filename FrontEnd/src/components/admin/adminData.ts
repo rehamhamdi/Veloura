@@ -1,9 +1,9 @@
-import { Grid2X2, LayoutDashboard, Mail, Package, ShoppingBag, Store, Users } from 'lucide-react'
+import { BadgePercent, LayoutDashboard, Mail, Package, ShoppingBag, Store, Users } from 'lucide-react'
 
 export const navigation = [
   { label: 'Dashboard', icon: LayoutDashboard },
   { label: 'Products', icon: Package },
-  { label: 'Categories', icon: Grid2X2 },
+  { label: 'Discounts', icon: BadgePercent },
   { label: 'Orders', icon: ShoppingBag },
   { label: 'Contacts', icon: Mail },
 ]

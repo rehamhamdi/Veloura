@@ -14,6 +14,6 @@ public interface IAppDbContext
     DbSet<WishlistItem> WishlistItems { get; }
     DbSet<Order> Orders { get; }
     DbSet<OrderItem> OrderItems { get; }
-
+    DbSet<Payment> Payments { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

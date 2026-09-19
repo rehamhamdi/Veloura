@@ -2,9 +2,11 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Veloura.Application.Common.Wrappers;
 using Veloura.Application.Common.Behaviors;
 using Veloura.Application.Common.Wrappers;
+using Veloura.Application.Common.Wrappers;
+using Veloura.Application.Services;
+using Veloura.Application.Interfaces;
 
 namespace Veloura.Application;
 
@@ -25,9 +27,9 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
         services.AddScoped<ResponseHandler>();
-
+        services.AddScoped<IPaymentService, PaymentService>();
         services.AddSingleton<ResponseHandler>();
-
+        services.AddScoped<IPaymentService, PaymentService>();
         return services;
     }
 }

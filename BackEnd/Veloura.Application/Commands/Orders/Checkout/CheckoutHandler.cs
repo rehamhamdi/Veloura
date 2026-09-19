@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Veloura.Application.Common.DTOs;
 using Veloura.Application.Common.Wrappers;
 using Veloura.Application.DTOs.Orders;
+using Veloura.Application.DTOs.Payments;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 using Veloura.Domain.Enums;
@@ -14,13 +15,13 @@ public class CheckoutHandler : IRequestHandler<CheckoutCommand, Response<OrderDt
 {
     private readonly IAppDbContext _context;
     private readonly ResponseHandler _responseHandler;
+    private readonly IPaymentService _paymentService;
 
-    public CheckoutHandler(
-        IAppDbContext context,
-        ResponseHandler responseHandler)
+    public CheckoutHandler(IAppDbContext context, ResponseHandler responseHandler, IPaymentService paymentService)
     {
         _context = context;
         _responseHandler = responseHandler;
+        _paymentService = paymentService;
     }
 
     public async Task<Response<OrderDto>> Handle(
@@ -186,6 +187,11 @@ if (discount is not null)
         _context.CartItems.RemoveRange(cartItems);
 
         await _context.SaveChangesAsync(cancellationToken);
+        var payment = await _paymentService.CreatePaymentAsync(
+                         order.Id,
+                         order.Total,
+                         request.PaymentMethod);
+
 
         var dto = new OrderDto
         {
@@ -207,6 +213,19 @@ if (discount is not null)
                 State = address.State,
                 PostalCode = address.PostalCode,
                 Country = address.Country
+            },
+
+            Payment = new PaymentDto
+            {
+                Id = payment.Id,
+                OrderId = payment.OrderId,
+                PaymentMethod = payment.PaymentMethod,
+                Status = payment.Status,
+                Amount = payment.Amount,
+                TransactionId = payment.TransactionId,
+                ProviderReference = payment.ProviderReference,
+                CreatedAt = payment.CreatedAt,
+                PaidAt = payment.PaidAt
             },
 
             Items = order.OrderItems.Select(oi => new OrderItemDto

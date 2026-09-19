@@ -1,49 +1,141 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { AxiosError } from 'axios'
 import api from '../../services/api'
-import type { ApiErrorResponse, AuthResponse, AuthState, LoginPayload, RawAuthResponse, RegisterPayload, User, UserRole } from '../../types/auth'
+
+export type UserRole = 'user' | 'buyer' | 'customer' | 'admin'
+
+export type User = {
+  id: string
+  name: string
+  email?: string
+  role: UserRole
+}
+
+type AuthResponse = {
+  token: string
+  user: User
+}
+
+type LoginApiResponse = {
+  succeeded: boolean
+  data?: {
+    token?: string
+    user?: {
+      id?: string | number
+      name?: string
+      email?: string
+      role?: string
+    }
+  }
+  message?: string
+}
+
+type RegisterPayload = {
+  name: string
+  email: string
+  password: string
+}
+
+type LoginPayload = {
+  email: string
+  password: string
+}
+
+type ApiErrorResponse = {
+  message?: string
+  error?: string
+}
+
+type AuthState = {
+  user: User | null
+  token: string | null
+  isLoading: boolean
+  error: string | null
+}
+
+function normalizeLoginResponse(response: LoginApiResponse): AuthResponse {
+  const token = response.data?.token
+  const apiUser = response.data?.user
+
+  if (!token || !apiUser) {
+    throw new Error(response.message ?? 'Login response is missing user data.')
+  }
+
+  return {
+    token,
+    user: {
+      id: String(apiUser.id ?? ''),
+      name: apiUser.name ?? '',
+      email: apiUser.email,
+      role: (apiUser.role ?? 'user').toLowerCase() as UserRole,
+    },
+  }
+}
+
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1]
+    if (!base64Url) return null
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch {
+    return null
+  }
+}
+
+function getInitialUser(): User | null {
+  try {
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      return JSON.parse(storedUser) as User
+    }
+    const token = localStorage.getItem('token')
+    if (token) {
+      const decoded = parseJwt(token)
+      if (decoded) {
+        const role =
+          decoded.role ||
+          decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
+          'user'
+        const name =
+          decoded.name ||
+          decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'] ||
+          decoded.email ||
+          'User'
+        const email =
+          decoded.email ||
+          decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+        const id = decoded.nameid || decoded.sub || String(decoded.id ?? '')
+        return {
+          id,
+          name,
+          email,
+          role: String(role).toLowerCase() as UserRole,
+        }
+      }
+    }
+  } catch {
+    return null
+  }
+  return null
+}
 
 const initialState: AuthState = {
-  user: readStoredUser(),
+  user: getInitialUser(),
   token: localStorage.getItem('token'),
   isLoading: false,
   error: null,
 }
 
-function readStoredUser(): User | null {
-  const storedUser = localStorage.getItem('user')
-
-  if (!storedUser) return null
-
-  try {
-    return JSON.parse(storedUser) as User
-  } catch {
-    localStorage.removeItem('user')
-    return null
-  }
-}
-
 function getErrorMessage(error: unknown) {
   const axiosError = error as AxiosError<ApiErrorResponse>
   return axiosError.response?.data?.message ?? axiosError.response?.data?.error ?? 'Something went wrong. Please try again.'
-}
-
-function normalizeAuthResponse(response: RawAuthResponse): AuthResponse {
-  let token = response.token ?? response.accessToken
-  let user = response.user
-
-  if (response.data && 'user' in response.data) {
-    token = response.data.token ?? response.data.accessToken ?? token
-    user = response.data.user
-  } else if (response.data) {
-    user = response.data as User
-  }
-
-  if (!token || !user) {
-    throw new Error('Login response is missing the token or user data.')
-  }
-
-  return { token, user: { ...user, role: user.role?.toLowerCase() as UserRole } }
 }
 
 export const registerUser = createAsyncThunk<void, RegisterPayload, { rejectValue: string }>(
@@ -61,8 +153,8 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginPayload, { rejectVa
   'auth/loginUser',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post<RawAuthResponse>('/auth/login', payload)
-      return normalizeAuthResponse(response.data)
+      const response = await api.post<LoginApiResponse>('/auth/login', payload)
+      return normalizeLoginResponse(response.data)
     } catch (error) {
       return rejectWithValue(getErrorMessage(error))
     }

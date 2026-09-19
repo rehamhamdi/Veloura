@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Veloura.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Veloura.Infrastructure.Persistence;
 namespace Veloura.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919093716_AddPayment")]
+    partial class AddPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,90 +134,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
                     b.ToTable("ContactMessages", (string)null);
                 });
 
-            modelBuilder.Entity("Veloura.Domain.Entities.Discount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int?>("MaxUses")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("MinimumOrderAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("StartsAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("UsedCount")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("Discounts", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Discounts_MinimumOrderAmount_NonNegative", "[MinimumOrderAmount] IS NULL OR [MinimumOrderAmount] >= 0");
-
-                            t.HasCheckConstraint("CK_Discounts_Value_Positive", "[Value] > 0");
-                        });
-                });
-
-            modelBuilder.Entity("Veloura.Domain.Entities.DiscountUsage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DiscountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UsedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("DiscountId", "UserId")
-                        .IsUnique();
-
-                    b.ToTable("DiscountUsages", (string)null);
-                });
-
             modelBuilder.Entity("Veloura.Domain.Entities.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -225,13 +144,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("DiscountCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
@@ -245,9 +157,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Total")
                         .HasColumnType("decimal(18,2)");
@@ -507,33 +416,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Veloura.Domain.Entities.DiscountUsage", b =>
-                {
-                    b.HasOne("Veloura.Domain.Entities.Discount", "Discount")
-                        .WithMany("Usages")
-                        .HasForeignKey("DiscountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Veloura.Domain.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Veloura.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Discount");
-
-                    b.Navigation("Order");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Veloura.Domain.Entities.Order", b =>
                 {
                     b.HasOne("Veloura.Domain.Entities.Address", "ShippingAddress")
@@ -616,11 +498,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Veloura.Domain.Entities.Address", b =>
                 {
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("Veloura.Domain.Entities.Discount", b =>
-                {
-                    b.Navigation("Usages");
                 });
 
             modelBuilder.Entity("Veloura.Domain.Entities.Order", b =>

@@ -4,4 +4,13 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://veloura.runasp.net',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 })

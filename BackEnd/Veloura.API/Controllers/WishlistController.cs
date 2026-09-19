@@ -19,7 +19,7 @@ namespace Veloura.API.Controllers
             _mediator = mediator;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Buyer")]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetWishlist(int userId)
         {
@@ -29,7 +29,7 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Buyer")]
         [HttpPost]
         public async Task<IActionResult> AddToWishlist(
             AddWishlistItemCommand command)
@@ -38,7 +38,7 @@ namespace Veloura.API.Controllers
 
             return StatusCode((int)result.StatusCode, result);
         }
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Buyer")]
         [HttpDelete]
         public async Task<IActionResult> RemoveFromWishlist(
             RemoveWishlistItemCommand command)

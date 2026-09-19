@@ -13,6 +13,11 @@ namespace Veloura.Application.DTOs.Orders
         public int Id { get; set; }
         public OrderStatus Status { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+
+        public decimal Subtotal { get; set; }
+        public string? DiscountCode { get; set; }
+        public decimal DiscountAmount { get; set; }
+
         public decimal Total { get; set; }
         public AddressDto ShippingAddress { get; set; } = default!;
         public List<OrderItemDto> Items { get; set; } = new();
@@ -20,5 +25,4 @@ namespace Veloura.Application.DTOs.Orders
         public DateTime UpdatedAt { get; set; }
         public PaymentDto? Payment { get; set; }
     }
-
 }

@@ -5,4 +5,9 @@ using Veloura.Domain.Enums;
 
 namespace Veloura.Application.Commands.Orders.Checkout;
 
-public record CheckoutCommand(int UserId, int ShippingAddressId, PaymentMethod PaymentMethod) : IRequest<Response<OrderDto>>;
+public record CheckoutCommand(
+    int UserId,
+    int ShippingAddressId,
+    PaymentMethod PaymentMethod,
+    string? DiscountCode
+) : IRequest<Response<OrderDto>>;

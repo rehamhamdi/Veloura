@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Veloura.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Veloura.Infrastructure.Persistence;
 namespace Veloura.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919072544_AddDiscounts")]
+    partial class AddDiscounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,52 +299,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
                     b.ToTable("OrderItems", (string)null);
                 });
 
-            modelBuilder.Entity("Veloura.Domain.Entities.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("ProviderReference")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("TransactionId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId")
-                        .IsUnique();
-
-                    b.ToTable("Payments", (string)null);
-                });
-
             modelBuilder.Entity("Veloura.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -572,17 +529,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Veloura.Domain.Entities.Payment", b =>
-                {
-                    b.HasOne("Veloura.Domain.Entities.Order", "Order")
-                        .WithOne("Payment")
-                        .HasForeignKey("Veloura.Domain.Entities.Payment", "OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("Veloura.Domain.Entities.ProductImage", b =>
                 {
                     b.HasOne("Veloura.Domain.Entities.Product", "Product")
@@ -626,8 +572,6 @@ namespace Veloura.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Veloura.Domain.Entities.Order", b =>
                 {
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Veloura.Domain.Entities.Product", b =>

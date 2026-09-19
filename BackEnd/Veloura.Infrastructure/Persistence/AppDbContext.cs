@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Text;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 
@@ -24,6 +20,8 @@ namespace Veloura.Infrastructure.Persistence
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+        public DbSet<Discount> Discounts => Set<Discount>();
+        public DbSet<DiscountUsage> DiscountUsages => Set<DiscountUsage>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +40,7 @@ namespace Veloura.Infrastructure.Persistence
                     (entry.State == EntityState.Added || entry.State == EntityState.Modified))
                     entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
             }
+
             return base.SaveChangesAsync(cancellationToken);
         }
     }

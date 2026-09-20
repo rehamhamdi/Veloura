@@ -88,8 +88,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
+                "http://localhost:5173",
                 "http://localhost:5174",
-                "https://veloura-opal.vercel.app"
+                "https://veloura-opal.vercel.app",
+                "https://veloura-skin-two.vercel.app"
               )
               .AllowAnyHeader()
               .AllowAnyMethod()

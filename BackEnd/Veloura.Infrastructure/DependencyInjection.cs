@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CloudinaryDotNet;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Veloura.Application.Interfaces;
+using Veloura.Infrastructure.Adapters;
 using Veloura.Infrastructure.PaymentGateways;
 using Veloura.Infrastructure.Persistence;
 using Veloura.Infrastructure.Repositories;
@@ -46,6 +48,19 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPaymentGateway, MockPaymentGateway>();
+
+        var cloudinarySettings = configuration.GetSection("Cloudinary");
+
+        var cloudinaryAccount = new Account(
+            cloudinarySettings["CloudName"],
+            cloudinarySettings["ApiKey"],
+            cloudinarySettings["ApiSecret"]);
+
+        var cloudinary = new Cloudinary(cloudinaryAccount);
+
+        services.AddSingleton(cloudinary);
+        services.AddScoped<IImageStorageService, ImageStorageService>();
+
         return services;
     }
 }

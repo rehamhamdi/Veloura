@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Veloura.Application.DTOs.Product
 {
@@ -18,6 +14,6 @@ namespace Veloura.Application.DTOs.Product
 
         public string? Category { get; set; }
 
-        public List<ProductImageDto> Images { get; set; } = new();
+        public List<IFormFile> Images { get; set; } = new();
     }
 }

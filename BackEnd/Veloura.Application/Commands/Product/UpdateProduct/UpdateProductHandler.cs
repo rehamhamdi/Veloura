@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Veloura.Application.Common.Wrappers;
 using Veloura.Application.DTOs.Product;
@@ -11,17 +6,20 @@ using Veloura.Application.Interfaces;
 
 namespace Veloura.Application.Commands.Product.UpdateProduct
 {
-    public class UpdateProductHandler: IRequestHandler<UpdateProductCommand, Response<ProductDto>>
+    public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Response<ProductDto>>
     {
         private readonly IAppDbContext _context;
         private readonly ResponseHandler _responseHandler;
+        private readonly IImageStorageService _imageStorageService;
 
         public UpdateProductHandler(
             IAppDbContext context,
-            ResponseHandler responseHandler)
+            ResponseHandler responseHandler,
+            IImageStorageService imageStorageService)
         {
             _context = context;
             _responseHandler = responseHandler;
+            _imageStorageService = imageStorageService;
         }
 
         public async Task<Response<ProductDto>> Handle(
@@ -51,12 +49,18 @@ namespace Veloura.Application.Commands.Product.UpdateProduct
 
             product.Images.Clear();
 
-            foreach (var image in dto.Images)
+            for (var i = 0; i < dto.Images.Count; i++)
             {
+                var image = dto.Images[i];
+
+                var imageUrl = await _imageStorageService.UploadImageAsync(
+                    image,
+                    cancellationToken);
+
                 product.Images.Add(new Domain.Entities.ProductImage
                 {
-                    Url = image.Url,
-                    SortOrder = image.SortOrder
+                    Url = imageUrl,
+                    SortOrder = i
                 });
             }
 

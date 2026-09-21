@@ -1,9 +1,4 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ProductEntity = Veloura.Domain.Entities.Product;
 using Veloura.Application.Common.Wrappers;
 using Veloura.Application.DTOs.Product;
@@ -12,17 +7,20 @@ using Veloura.Domain.Entities;
 
 namespace Veloura.Application.Commands.Product.CreateProduct
 {
-    public class CreateProductHandler: IRequestHandler<CreateProductCommand, Response<ProductDto>>
+    public class CreateProductHandler : IRequestHandler<CreateProductCommand, Response<ProductDto>>
     {
         private readonly IAppDbContext _context;
         private readonly ResponseHandler _responseHandler;
+        private readonly IImageStorageService _imageStorageService;
 
         public CreateProductHandler(
             IAppDbContext context,
-            ResponseHandler responseHandler)
+            ResponseHandler responseHandler,
+            IImageStorageService imageStorageService)
         {
             _context = context;
             _responseHandler = responseHandler;
+            _imageStorageService = imageStorageService;
         }
 
         public async Task<Response<ProductDto>> Handle(
@@ -42,12 +40,18 @@ namespace Veloura.Application.Commands.Product.CreateProduct
                 UpdatedAt = DateTime.UtcNow
             };
 
-            foreach (var image in dto.Images)
+            for (var i = 0; i < dto.Images.Count; i++)
             {
+                var image = dto.Images[i];
+
+                var imageUrl = await _imageStorageService.UploadImageAsync(
+                    image,
+                    cancellationToken);
+
                 product.Images.Add(new ProductImage
                 {
-                    Url = image.Url,
-                    SortOrder = image.SortOrder
+                    Url = imageUrl,
+                    SortOrder = i
                 });
             }
 

@@ -9,7 +9,6 @@ using Veloura.Application.Queries.Product.GetProducts;
 
 namespace Veloura.API.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class ProductController : ControllerBase
@@ -40,8 +39,9 @@ namespace Veloura.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> CreateProduct(
-            CreateProductCommand command)
+            [FromForm] CreateProductCommand command)
         {
             var result = await _mediator.Send(command);
 
@@ -50,9 +50,10 @@ namespace Veloura.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> UpdateProduct(
             int id,
-            UpdateProductCommand command)
+            [FromForm] UpdateProductCommand command)
         {
             command.Id = id;
 

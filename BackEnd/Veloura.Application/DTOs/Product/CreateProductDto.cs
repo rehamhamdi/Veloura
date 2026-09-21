@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Http;
 
-namespace Veloura.Application.DTOs.Product
+namespace Veloura.Application.DTOs.Product;
+
+public class CreateProductDto
 {
-    public class CreateProductDto
-    {
-        public string Title { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
+    public string? Description { get; set; }
 
-        public decimal Price { get; set; }
+    public decimal Price { get; set; }
 
-        public int Stock { get; set; }
+    public int Stock { get; set; }
 
-        public string? Category { get; set; }
+    public string? Category { get; set; }
 
-        public List<ProductImageDto> Images { get; set; } = new();
-    }
+    public List<IFormFile> Images { get; set; } = new();
 }

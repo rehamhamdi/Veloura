@@ -1,13 +1,8 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Veloura.Application.Commands.Product.CreateProduct
 {
-
     public class CreateProductValidator : AbstractValidator<CreateProductCommand>
     {
         public CreateProductValidator()
@@ -27,15 +22,11 @@ namespace Veloura.Application.Commands.Product.CreateProduct
                 .When(x => !string.IsNullOrEmpty(x.Product.Category));
 
             RuleForEach(x => x.Product.Images)
-                .ChildRules(image =>
-                {
-                    image.RuleFor(i => i.Url)
-                        .NotEmpty()
-                        .MaximumLength(500);
-
-                    image.RuleFor(i => i.SortOrder)
-                        .GreaterThanOrEqualTo(0);
-                });
+                .NotNull()
+                .Must(file => file.Length > 0)
+                .WithMessage("Image file cannot be empty.")
+                .Must(file => file.ContentType.StartsWith("image/"))
+                .WithMessage("Only image files are allowed.");
         }
     }
 }

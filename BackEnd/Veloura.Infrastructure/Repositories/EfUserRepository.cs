@@ -30,4 +30,9 @@ public class EfUserRepository : IUserRepository
         _db.Users.Update(user);
         await _db.SaveChangesAsync(ct);
     }
+    //public async Task<User?> GetByResetTokenAsync(string token, CancellationToken cancellationToken)
+    //{
+    //    return await _db.Users
+    //        .FirstOrDefaultAsync(u => u.PasswordResetToken == token, cancellationToken);
+    //}
 }

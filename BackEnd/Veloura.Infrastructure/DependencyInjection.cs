@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Veloura.Application.Interfaces;
+using Veloura.Infrastructure.Email;
 using Veloura.Infrastructure.Adapters;
 using Veloura.Infrastructure.PaymentGateways;
 using Veloura.Infrastructure.Persistence;
@@ -48,6 +49,7 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPaymentGateway, MockPaymentGateway>();
+        services.AddScoped<IEmailService, SmtpEmailService>();
 
         var cloudinarySettings = configuration.GetSection("Cloudinary");
 

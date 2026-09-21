@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Veloura.Application.Common.Wrappers;
+using Veloura.Application.Features.Auth.ForgotPassword;
 using Veloura.Application.Features.Auth.GetMe;
 using Veloura.Application.Features.Auth.Login;
 using Veloura.Application.Features.Auth.Register;
+using Veloura.Application.Features.Auth.ResetPassword;
 
 namespace Veloura.API.Controllers;
 
@@ -48,6 +50,34 @@ public class AuthController : ControllerBase
         var response = _responseHandler.Success(
             result,
             "Login successful.");
+
+        return Ok(response);
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword(
+    ForgotPasswordCommand command,
+    CancellationToken ct)
+    {
+        await _sender.Send(command, ct);
+
+        var response = _responseHandler.Success<object?>(
+            null,
+            "If this email exists, a password reset link has been sent");
+
+        return Ok(response);
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(
+     ResetPasswordCommand command,
+     CancellationToken ct)
+    {
+        await _sender.Send(command, ct);
+
+        var response = _responseHandler.Success<object?>(
+            null,
+            "Password has been reset successfully");
 
         return Ok(response);
     }

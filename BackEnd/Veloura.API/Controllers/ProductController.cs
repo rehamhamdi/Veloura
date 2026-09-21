@@ -21,9 +21,6 @@ namespace Veloura.API.Controllers
             _mediator = mediator;
         }
 
-
-
-        [Authorize(Roles = "Buyer,Admin")]
         [HttpGet]
         public async Task<IActionResult> GetProducts()
         {
@@ -32,7 +29,6 @@ namespace Veloura.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [Authorize(Roles = "Buyer,Admin")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {

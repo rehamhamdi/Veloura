@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Veloura.Application.Common.Behaviors;
 using Veloura.Application.Common.Wrappers;
-using Veloura.Application.Common.Wrappers;
 using Veloura.Application.Services;
 using Veloura.Application.Interfaces;
 

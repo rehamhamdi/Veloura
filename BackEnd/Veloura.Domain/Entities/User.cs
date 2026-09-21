@@ -14,6 +14,9 @@ namespace Veloura.Domain.Entities
         public string PasswordHash { get; set; } = default!;
         public UserRole Role { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? OtpCodeHash { get; set; }
+        public DateTime? OtpExpiresAt { get; set; }
+        public int OtpAttempts { get; set; }
 
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
         public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();

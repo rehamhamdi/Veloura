@@ -10,4 +10,12 @@ public interface IContactMessageRepository
 
     Task<List<ContactMessage>> GetAllAsync(
         CancellationToken cancellationToken);
+
+    Task<ContactMessage?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken);
+
+    Task UpdateAsync(
+        ContactMessage contactMessage,
+        CancellationToken cancellationToken);
 }

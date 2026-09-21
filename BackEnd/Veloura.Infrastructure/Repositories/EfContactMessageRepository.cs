@@ -30,4 +30,21 @@ public class EfContactMessageRepository : IContactMessageRepository
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<ContactMessage?> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        return await _db.ContactMessages
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public async Task UpdateAsync(
+        ContactMessage contactMessage,
+        CancellationToken cancellationToken)
+    {
+        _db.ContactMessages.Update(contactMessage);
+
+        await _db.SaveChangesAsync(cancellationToken);
+    }
 }

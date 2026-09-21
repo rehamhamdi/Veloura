@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Veloura.Application.Commands.Contact.MarkAsRead;
 using Veloura.Application.Queries.Contact.GetMessages;
 
 namespace Veloura.API.Controllers;
@@ -23,6 +24,20 @@ public class AdminContactController : ControllerBase
     {
         var response = await _mediator.Send(
             new GetContactMessagesQuery(),
+            cancellationToken);
+
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
+    }
+
+    [HttpPut("{id:int}/read")]
+    public async Task<IActionResult> MarkAsRead(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new MarkContactMessageAsReadCommand(id),
             cancellationToken);
 
         return StatusCode(

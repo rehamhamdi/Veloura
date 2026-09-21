@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿using FluentValidation;
+using System.Net;
 using System.Text.Json;
-using FluentValidation;
 using Veloura.Application.Common.Exceptions;
 using Veloura.Application.Common.Wrappers;
+using static Veloura.Application.Common.Exceptions.InvalidCredentialsException;
 
 namespace Veloura.API.Middleware;
 
@@ -66,6 +67,13 @@ public class ExceptionHandlingMiddleware
                     response = _responseHandler.NotFound<object?>(
                         ex.Message);
 
+                    break;
+                case InvalidOrExpiredOtpException:
+                    response = _responseHandler.BadRequest<object?>(ex.Message);
+                    break;
+
+                case TooManyOtpAttemptsException:
+                    response = _responseHandler.BadRequest<object?>(ex.Message);
                     break;
 
                 default:

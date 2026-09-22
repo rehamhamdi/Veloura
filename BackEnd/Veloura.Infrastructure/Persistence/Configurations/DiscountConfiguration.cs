@@ -8,7 +8,18 @@ public class DiscountConfiguration : IEntityTypeConfiguration<Discount>
 {
     public void Configure(EntityTypeBuilder<Discount> builder)
     {
-        builder.ToTable("Discounts");
+        builder.ToTable(
+     "Discounts",
+     tableBuilder =>
+     {
+         tableBuilder.HasCheckConstraint(
+             "CK_Discounts_Value_NonNegative",
+             "[Value] >= 0");
+
+         tableBuilder.HasCheckConstraint(
+             "CK_Discounts_MinimumOrderAmount_NonNegative",
+             "[MinimumOrderAmount] IS NULL OR [MinimumOrderAmount] >= 0");
+     });
 
         builder.HasKey(d => d.Id);
 
@@ -18,6 +29,13 @@ public class DiscountConfiguration : IEntityTypeConfiguration<Discount>
 
         builder.HasIndex(d => d.Code)
                .IsUnique();
+
+        builder.Property(d => d.Title)
+               .IsRequired()
+               .HasMaxLength(200);
+
+        builder.Property(d => d.Description)
+               .HasMaxLength(1000);
 
         builder.Property(d => d.Type)
                .HasConversion<string>()
@@ -29,18 +47,14 @@ public class DiscountConfiguration : IEntityTypeConfiguration<Discount>
         builder.Property(d => d.MinimumOrderAmount)
                .HasColumnType("decimal(18,2)");
 
+        builder.Property(d => d.AppliesTo)
+               .IsRequired()
+               .HasMaxLength(200);
+
         builder.Property(d => d.UsedCount)
                .IsRequired();
 
         builder.Property(d => d.IsActive)
                .IsRequired();
-
-        builder.HasCheckConstraint(
-            "CK_Discounts_Value_Positive",
-            "[Value] > 0");
-
-        builder.HasCheckConstraint(
-            "CK_Discounts_MinimumOrderAmount_NonNegative",
-            "[MinimumOrderAmount] IS NULL OR [MinimumOrderAmount] >= 0");
     }
 }

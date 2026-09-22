@@ -7,7 +7,8 @@ using Veloura.Domain.Entities;
 
 namespace Veloura.Application.Commands.Discounts.CreateDiscount;
 
-public class CreateDiscountHandler : IRequestHandler<CreateDiscountCommand, Response<DiscountDto>>
+public class CreateDiscountHandler
+    : IRequestHandler<CreateDiscountCommand, Response<DiscountDto>>
 {
     private readonly IAppDbContext _context;
     private readonly ResponseHandler _responseHandler;
@@ -26,23 +27,30 @@ public class CreateDiscountHandler : IRequestHandler<CreateDiscountCommand, Resp
     {
         var dto = request.Discount;
 
-        var code = dto.Code.Trim().ToUpperInvariant();
+        var normalizedCode = dto.Code
+            .Trim()
+            .ToUpperInvariant();
 
         var exists = await _context.Discounts
-            .AnyAsync(d => d.Code == code, cancellationToken);
+            .AnyAsync(
+                d => d.Code == normalizedCode,
+                cancellationToken);
 
         if (exists)
         {
-            return _responseHandler.Conflict<DiscountDto>(
-                "A discount with this code already exists.");
+            return _responseHandler.BadRequest<DiscountDto>(
+                "Discount code already exists.");
         }
 
         var discount = new Discount
         {
-            Code = code,
+            Code = normalizedCode,
+            Title = dto.Title.Trim(),
+            Description = dto.Description?.Trim(),
             Type = dto.Type,
             Value = dto.Value,
             MinimumOrderAmount = dto.MinimumOrderAmount,
+            AppliesTo = dto.AppliesTo.Trim(),
             StartsAt = dto.StartsAt,
             ExpiresAt = dto.ExpiresAt,
             MaxUses = dto.MaxUses,
@@ -50,16 +58,20 @@ public class CreateDiscountHandler : IRequestHandler<CreateDiscountCommand, Resp
             IsActive = true
         };
 
-        await _context.Discounts.AddAsync(discount, cancellationToken);
+        _context.Discounts.Add(discount);
+
         await _context.SaveChangesAsync(cancellationToken);
 
         var result = new DiscountDto
         {
             Id = discount.Id,
             Code = discount.Code,
+            Title = discount.Title,
+            Description = discount.Description,
             Type = discount.Type,
             Value = discount.Value,
             MinimumOrderAmount = discount.MinimumOrderAmount,
+            AppliesTo = discount.AppliesTo,
             StartsAt = discount.StartsAt,
             ExpiresAt = discount.ExpiresAt,
             MaxUses = discount.MaxUses,

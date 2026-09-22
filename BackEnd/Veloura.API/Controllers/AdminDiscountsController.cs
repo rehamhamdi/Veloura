@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Veloura.Application.Commands.Discounts.CreateDiscount;
+using Veloura.Application.Commands.Discounts.DeleteDiscount;
+using Veloura.Application.Commands.Discounts.UpdateDiscount;
 using Veloura.Application.Commands.Discounts.UpdateDiscountStatus;
 using Veloura.Application.Queries.Discounts.GetAllDiscounts;
 using Veloura.Application.Queries.Discounts.GetDiscountUsages;
@@ -25,9 +27,13 @@ public class AdminDiscountsController : ControllerBase
         [FromBody] CreateDiscountCommand command,
         CancellationToken cancellationToken)
     {
-        var response = await _mediator.Send(command, cancellationToken);
+        var response = await _mediator.Send(
+            command,
+            cancellationToken);
 
-        return StatusCode((int)response.StatusCode, response);
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
     }
 
     [HttpGet]
@@ -38,7 +44,9 @@ public class AdminDiscountsController : ControllerBase
             new GetAllDiscountsQuery(),
             cancellationToken);
 
-        return StatusCode((int)response.StatusCode, response);
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
     }
 
     [HttpGet("{discountId:int}/usages")]
@@ -50,7 +58,26 @@ public class AdminDiscountsController : ControllerBase
             new GetDiscountUsagesQuery(discountId),
             cancellationToken);
 
-        return StatusCode((int)response.StatusCode, response);
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(
+        int id,
+        [FromBody] UpdateDiscountCommand command,
+        CancellationToken cancellationToken)
+    {
+        var request = command with { Id = id };
+
+        var response = await _mediator.Send(
+            request,
+            cancellationToken);
+
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
     }
 
     [HttpPut("{id:int}/status")]
@@ -65,6 +92,22 @@ public class AdminDiscountsController : ControllerBase
             request,
             cancellationToken);
 
-        return StatusCode((int)response.StatusCode, response);
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var response = await _mediator.Send(
+            new DeleteDiscountCommand(id),
+            cancellationToken);
+
+        return StatusCode(
+            (int)response.StatusCode,
+            response);
     }
 }

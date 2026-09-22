@@ -1,12 +1,16 @@
 ﻿using FluentValidation;
 using Veloura.Domain.Enums;
 
-namespace Veloura.Application.Commands.Discounts.CreateDiscount;
+namespace Veloura.Application.Commands.Discounts.UpdateDiscount;
 
-public class CreateDiscountValidator : AbstractValidator<CreateDiscountCommand>
+public class UpdateDiscountValidator
+    : AbstractValidator<UpdateDiscountCommand>
 {
-    public CreateDiscountValidator()
+    public UpdateDiscountValidator()
     {
+        RuleFor(x => x.Id)
+            .GreaterThan(0);
+
         RuleFor(x => x.Discount.Code)
             .NotEmpty()
             .MaximumLength(50);
@@ -23,7 +27,7 @@ public class CreateDiscountValidator : AbstractValidator<CreateDiscountCommand>
             .IsInEnum();
 
         RuleFor(x => x.Discount.Value)
-      .GreaterThanOrEqualTo(0);
+     .GreaterThanOrEqualTo(0);
 
         RuleFor(x => x.Discount.Value)
             .GreaterThan(0)

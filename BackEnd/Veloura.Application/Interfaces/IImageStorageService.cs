@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
-namespace Veloura.Application.Interfaces;
 
-
-public interface IImageStorageService
+namespace Veloura.Application.Interfaces
 {
-    Task<string> UploadImageAsync(
-        IFormFile file,
-        CancellationToken cancellationToken);
+    public interface IImageStorageService
+    {
+        Task<string> UploadImageAsync(
+            IFormFile file,
+            CancellationToken cancellationToken);
+
+        Task DeleteImageAsync(
+            string imageUrl,
+            CancellationToken cancellationToken);
+    }
 }

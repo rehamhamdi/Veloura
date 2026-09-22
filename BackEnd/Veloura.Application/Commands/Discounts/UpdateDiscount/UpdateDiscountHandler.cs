@@ -4,15 +4,15 @@ using Veloura.Application.Common.Wrappers;
 using Veloura.Application.DTOs.Discounts;
 using Veloura.Application.Interfaces;
 
-namespace Veloura.Application.Commands.Discounts.UpdateDiscountStatus;
+namespace Veloura.Application.Commands.Discounts.UpdateDiscount;
 
-public class UpdateDiscountStatusHandler
-    : IRequestHandler<UpdateDiscountStatusCommand, Response<DiscountDto>>
+public class UpdateDiscountHandler
+    : IRequestHandler<UpdateDiscountCommand, Response<DiscountDto>>
 {
     private readonly IAppDbContext _context;
     private readonly ResponseHandler _responseHandler;
 
-    public UpdateDiscountStatusHandler(
+    public UpdateDiscountHandler(
         IAppDbContext context,
         ResponseHandler responseHandler)
     {
@@ -21,27 +21,46 @@ public class UpdateDiscountStatusHandler
     }
 
     public async Task<Response<DiscountDto>> Handle(
-        UpdateDiscountStatusCommand request,
+        UpdateDiscountCommand request,
         CancellationToken cancellationToken)
     {
         var discount = await _context.Discounts
             .FirstOrDefaultAsync(
-                d => d.Id == request.DiscountId,
+                d => d.Id == request.Id,
                 cancellationToken);
 
         if (discount is null)
+        {
             return _responseHandler.NotFound<DiscountDto>(
                 "Discount not found.");
-
-        if (discount.IsActive == request.IsActive)
-        {
-            var currentStatus = request.IsActive ? "active" : "inactive";
-
-            return _responseHandler.BadRequest<DiscountDto>(
-                $"Discount is already {currentStatus}.");
         }
 
-        discount.IsActive = request.IsActive;
+        var normalizedCode = request.Discount.Code
+            .Trim()
+            .ToUpperInvariant();
+
+        var codeExists = await _context.Discounts
+            .AnyAsync(
+                d => d.Id != request.Id &&
+                     d.Code == normalizedCode,
+                cancellationToken);
+
+        if (codeExists)
+        {
+            return _responseHandler.BadRequest<DiscountDto>(
+                "Discount code already exists.");
+        }
+
+        discount.Code = normalizedCode;
+        discount.Title = request.Discount.Title.Trim();
+        discount.Description = request.Discount.Description?.Trim();
+        discount.Type = request.Discount.Type;
+        discount.Value = request.Discount.Value;
+        discount.MinimumOrderAmount = request.Discount.MinimumOrderAmount;
+        discount.AppliesTo = request.Discount.AppliesTo.Trim();
+        discount.StartsAt = request.Discount.StartsAt;
+        discount.ExpiresAt = request.Discount.ExpiresAt;
+        discount.MaxUses = request.Discount.MaxUses;
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -64,6 +83,6 @@ public class UpdateDiscountStatusHandler
 
         return _responseHandler.Success(
             dto,
-            "Discount status updated successfully.");
+            "Discount updated successfully.");
     }
 }

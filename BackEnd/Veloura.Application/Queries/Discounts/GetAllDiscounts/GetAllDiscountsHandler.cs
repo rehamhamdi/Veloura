@@ -6,7 +6,8 @@ using Veloura.Application.Interfaces;
 
 namespace Veloura.Application.Queries.Discounts.GetAllDiscounts;
 
-public class GetAllDiscountsHandler : IRequestHandler<GetAllDiscountsQuery, Response<List<DiscountDto>>>
+public class GetAllDiscountsHandler
+    : IRequestHandler<GetAllDiscountsQuery, Response<List<DiscountDto>>>
 {
     private readonly IAppDbContext _context;
     private readonly ResponseHandler _responseHandler;
@@ -24,15 +25,16 @@ public class GetAllDiscountsHandler : IRequestHandler<GetAllDiscountsQuery, Resp
         CancellationToken cancellationToken)
     {
         var discounts = await _context.Discounts
-            .AsNoTracking()
-            .OrderByDescending(d => d.Id)
             .Select(d => new DiscountDto
             {
                 Id = d.Id,
                 Code = d.Code,
+                Title = d.Title,
+                Description = d.Description,
                 Type = d.Type,
                 Value = d.Value,
                 MinimumOrderAmount = d.MinimumOrderAmount,
+                AppliesTo = d.AppliesTo,
                 StartsAt = d.StartsAt,
                 ExpiresAt = d.ExpiresAt,
                 MaxUses = d.MaxUses,

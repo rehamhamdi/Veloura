@@ -9,6 +9,9 @@ namespace Veloura.Application.Commands.Product.UpdateProduct
             RuleFor(x => x.Id)
                 .GreaterThan(0);
 
+            RuleFor(x => x.Product)
+                .NotNull();
+
             RuleFor(x => x.Product.Title)
                 .NotEmpty()
                 .MaximumLength(250);

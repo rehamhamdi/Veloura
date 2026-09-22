@@ -13,11 +13,12 @@ public class DiscountTypeJsonConverter : JsonConverter<DiscountType>
     {
         var value = reader.GetString();
 
-        return value switch
+        return value?.ToLowerInvariant() switch
         {
             "percentage" => DiscountType.Percentage,
             "fixed" => DiscountType.FixedAmount,
             "free_shipping" => DiscountType.FreeShipping,
+
             _ => throw new JsonException(
                 $"Unknown discount type: {value}")
         };
@@ -33,6 +34,7 @@ public class DiscountTypeJsonConverter : JsonConverter<DiscountType>
             DiscountType.Percentage => "percentage",
             DiscountType.FixedAmount => "fixed",
             DiscountType.FreeShipping => "free_shipping",
+
             _ => throw new JsonException(
                 $"Unknown discount type: {value}")
         };

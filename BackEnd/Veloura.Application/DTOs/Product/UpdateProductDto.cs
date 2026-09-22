@@ -15,5 +15,7 @@ namespace Veloura.Application.DTOs.Product
         public string? Category { get; set; }
 
         public List<IFormFile> Images { get; set; } = new();
+
+        public bool RemoveExistingImages { get; set; }
     }
 }

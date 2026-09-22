@@ -49,8 +49,18 @@ namespace Veloura.Application.Commands.Product.UpdateProduct
             product.UpdatedAt = DateTime.UtcNow;
 
             // Update images only when new images are provided
-            if (dto.Images != null && dto.Images.Count > 0)
+            // Handle images
+            if (dto.RemoveExistingImages || dto.Images.Count > 0)
             {
+                var oldImages = product.Images.ToList();
+
+                foreach (var oldImage in oldImages)
+                {
+                    await _imageStorageService.DeleteImageAsync(
+                        oldImage.Url,
+                        cancellationToken);
+                }
+
                 product.Images.Clear();
 
                 for (var i = 0; i < dto.Images.Count; i++)

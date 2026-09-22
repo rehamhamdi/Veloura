@@ -40,6 +40,7 @@ namespace Veloura.Application.Commands.Product.UpdateProduct
 
             var dto = request.Product;
 
+            // Update product information
             product.Title = dto.Title;
             product.Description = dto.Description;
             product.Price = dto.Price;
@@ -47,21 +48,25 @@ namespace Veloura.Application.Commands.Product.UpdateProduct
             product.Category = dto.Category;
             product.UpdatedAt = DateTime.UtcNow;
 
-            product.Images.Clear();
-
-            for (var i = 0; i < dto.Images.Count; i++)
+            // Update images only when new images are provided
+            if (dto.Images != null && dto.Images.Count > 0)
             {
-                var image = dto.Images[i];
+                product.Images.Clear();
 
-                var imageUrl = await _imageStorageService.UploadImageAsync(
-                    image,
-                    cancellationToken);
-
-                product.Images.Add(new Domain.Entities.ProductImage
+                for (var i = 0; i < dto.Images.Count; i++)
                 {
-                    Url = imageUrl,
-                    SortOrder = i
-                });
+                    var image = dto.Images[i];
+
+                    var imageUrl = await _imageStorageService.UploadImageAsync(
+                        image,
+                        cancellationToken);
+
+                    product.Images.Add(new Domain.Entities.ProductImage
+                    {
+                        Url = imageUrl,
+                        SortOrder = i
+                    });
+                }
             }
 
             await _context.SaveChangesAsync(cancellationToken);

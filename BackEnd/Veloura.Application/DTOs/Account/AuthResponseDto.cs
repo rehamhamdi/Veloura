@@ -1,4 +1,4 @@
-﻿namespace Veloura.Application.Common.DTOs;
+﻿namespace Veloura.Application.DTOs.Account;
 
 public class AuthResponseDto
 {

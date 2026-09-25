@@ -15,12 +15,18 @@ public class CheckoutHandler : IRequestHandler<CheckoutCommand, Response<OrderDt
     private readonly IAppDbContext _context;
     private readonly ResponseHandler _responseHandler;
     private readonly IPaymentService _paymentService;
+    private readonly IPaymentGateway _paymentGateway;
 
-    public CheckoutHandler(IAppDbContext context, ResponseHandler responseHandler, IPaymentService paymentService)
+    public CheckoutHandler(
+        IAppDbContext context,
+        ResponseHandler responseHandler,
+        IPaymentService paymentService,
+        IPaymentGateway paymentGateway)
     {
         _context = context;
         _responseHandler = responseHandler;
         _paymentService = paymentService;
+        _paymentGateway = paymentGateway;
     }
 
     public async Task<Response<OrderDto>> Handle(
@@ -55,85 +61,54 @@ public class CheckoutHandler : IRequestHandler<CheckoutCommand, Response<OrderDt
             }
         }
 
-        // Calculate the order subtotal before applying any discount.
-        var subtotal = cartItems.Sum(
-            c => c.Product.Price * c.Quantity);
+        var subtotal = cartItems.Sum(c => c.Product.Price * c.Quantity);
 
         decimal discountAmount = 0;
         string? appliedDiscountCode = null;
         Discount? discount = null;
 
-        // Apply discount only when a code was provided.
         if (!string.IsNullOrWhiteSpace(request.DiscountCode))
         {
             var normalizedCode = request.DiscountCode.Trim().ToUpperInvariant();
 
             discount = await _context.Discounts
-                .FirstOrDefaultAsync(
-                    d => d.Code == normalizedCode,
-                    cancellationToken);
+                .FirstOrDefaultAsync(d => d.Code == normalizedCode, cancellationToken);
 
             if (discount is null)
-            {
-                return _responseHandler.UnprocessableEntity<OrderDto>(
-                    "Invalid discount code.");
-            }
+                return _responseHandler.UnprocessableEntity<OrderDto>("Invalid discount code.");
 
             var now = DateTime.UtcNow;
 
             if (!discount.IsActive)
-            {
-                return _responseHandler.UnprocessableEntity<OrderDto>(
-                    "This discount code is inactive.");
-            }
+                return _responseHandler.UnprocessableEntity<OrderDto>("This discount code is inactive.");
 
             if (now < discount.StartsAt)
-            {
-                return _responseHandler.UnprocessableEntity<OrderDto>(
-                    "This discount code is not active yet.");
-            }
+                return _responseHandler.UnprocessableEntity<OrderDto>("This discount code is not active yet.");
 
-            if (discount.ExpiresAt.HasValue &&
-                now > discount.ExpiresAt.Value)
-            {
-                return _responseHandler.UnprocessableEntity<OrderDto>(
-                    "This discount code has expired.");
-            }
+            if (discount.ExpiresAt.HasValue && now > discount.ExpiresAt.Value)
+                return _responseHandler.UnprocessableEntity<OrderDto>("This discount code has expired.");
 
-            if (discount.MaxUses.HasValue &&
-                discount.UsedCount >= discount.MaxUses.Value)
-            {
+            if (discount.MaxUses.HasValue && discount.UsedCount >= discount.MaxUses.Value)
                 return _responseHandler.UnprocessableEntity<OrderDto>(
                     "This discount code has reached its maximum usage limit.");
-            }
 
             var alreadyUsed = await _context.DiscountUsages
                 .AnyAsync(
-                    du => du.DiscountId == discount.Id &&
-                          du.UserId == request.UserId,
+                    du => du.DiscountId == discount.Id && du.UserId == request.UserId,
                     cancellationToken);
 
             if (alreadyUsed)
-            {
                 return _responseHandler.UnprocessableEntity<OrderDto>(
                     "You have already used this discount code.");
-            }
 
-            if (discount.MinimumOrderAmount.HasValue &&
-                subtotal < discount.MinimumOrderAmount.Value)
-            {
+            if (discount.MinimumOrderAmount.HasValue && subtotal < discount.MinimumOrderAmount.Value)
                 return _responseHandler.UnprocessableEntity<OrderDto>(
                     $"This discount requires a minimum order amount of {discount.MinimumOrderAmount.Value:0.00}.");
-            }
 
             discountAmount = discount.Type switch
             {
-                DiscountType.Percentage =>
-                    subtotal * (discount.Value / 100m),
-
-                DiscountType.FixedAmount =>
-                    Math.Min(discount.Value, subtotal),
-
+                DiscountType.Percentage => subtotal * (discount.Value / 100m),
+                DiscountType.FixedAmount => Math.Min(discount.Value, subtotal),
                 _ => 0
             };
 
@@ -164,33 +139,59 @@ public class CheckoutHandler : IRequestHandler<CheckoutCommand, Response<OrderDt
                 Price = item.Product.Price
             });
 
-            // Reserve stock for the order.
             item.Product.Stock -= item.Quantity;
         }
 
+        await using var transaction = await _context.BeginTransactionAsync(cancellationToken);
+
         _context.Orders.Add(order);
 
-if (discount is not null)
-{
-    discount.UsedCount++;
+        if (discount is not null)
+        {
+            discount.UsedCount++;
 
-    _context.DiscountUsages.Add(new DiscountUsage
-    {
-        DiscountId = discount.Id,
-        UserId = request.UserId,
-        Order = order,
-        UsedAt = DateTime.UtcNow
-    });
-}
+            _context.DiscountUsages.Add(new DiscountUsage
+            {
+                DiscountId = discount.Id,
+                UserId = request.UserId,
+                Order = order,
+                UsedAt = DateTime.UtcNow
+            });
+        }
 
         _context.CartItems.RemoveRange(cartItems);
 
         await _context.SaveChangesAsync(cancellationToken);
-        var payment = await _paymentService.CreatePaymentAsync(
-                         order.Id,
-                         order.Total,
-                         request.PaymentMethod);
 
+        var payment = await _paymentService.CreatePaymentAsync(
+            order.Id,
+            order.Total,
+            request.PaymentMethod);
+
+        var gatewayResult = await _paymentGateway.ChargeAsync(
+            order.Id,
+            order.Total,
+            request.PaymentMethod,
+            request.PaymentToken,
+            cancellationToken);
+
+        if (!gatewayResult.Succeeded)
+        {
+            await _paymentService.MarkAsFailedAsync(payment.Id);
+
+            await transaction.RollbackAsync(cancellationToken);
+
+            return _responseHandler.UnprocessableEntity<OrderDto>(
+                gatewayResult.ErrorMessage
+                ?? "Payment failed. Please try again or choose a different payment method.");
+        }
+
+        await _paymentService.MarkAsPaidAsync(
+            payment.Id,
+            gatewayResult.TransactionId,
+            gatewayResult.ProviderReference);
+
+        await transaction.CommitAsync(cancellationToken);
 
         var dto = new OrderDto
         {
@@ -219,12 +220,12 @@ if (discount is not null)
                 Id = payment.Id,
                 OrderId = payment.OrderId,
                 PaymentMethod = payment.PaymentMethod,
-                Status = payment.Status,
+                Status = PaymentStatus.Paid,
                 Amount = payment.Amount,
-                TransactionId = payment.TransactionId,
-                ProviderReference = payment.ProviderReference,
+                TransactionId = gatewayResult.TransactionId,
+                ProviderReference = gatewayResult.ProviderReference,
                 CreatedAt = payment.CreatedAt,
-                PaidAt = payment.PaidAt
+                PaidAt = DateTime.UtcNow
             },
 
             Items = order.OrderItems.Select(oi => new OrderItemDto
@@ -241,8 +242,6 @@ if (discount is not null)
             UpdatedAt = order.UpdatedAt
         };
 
-        return _responseHandler.Created(
-            dto,
-            "Order placed successfully.");
+        return _responseHandler.Created(dto, "Order placed successfully.");
     }
 }

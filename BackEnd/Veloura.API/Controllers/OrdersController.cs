@@ -7,6 +7,7 @@ using Veloura.Application.Commands.Orders.Checkout;
 using Veloura.Application.DTOs.Orders;
 using Veloura.Application.Queries.Orders.GetMyOrders;
 using Veloura.Application.Queries.Orders.GetOrderById;
+using Veloura.Domain.Enums;
 
 namespace Veloura.API.Controllers;
 
@@ -27,15 +28,16 @@ public class OrdersController : ControllerBase
 
     [HttpPost("checkout")]
     public async Task<IActionResult> Checkout(
-    [FromBody] CheckoutRequest request,
-    CancellationToken cancellationToken)
+        [FromBody] CheckoutRequest request,
+        CancellationToken cancellationToken)
     {
         var response = await _mediator.Send(
             new CheckoutCommand(
                 CurrentUserId,
                 request.ShippingAddressId,
                 request.PaymentMethod,
-                request.DiscountCode),
+                request.DiscountCode,
+                request.PaymentToken),
             cancellationToken);
 
         return StatusCode((int)response.StatusCode, response);
@@ -62,3 +64,9 @@ public class OrdersController : ControllerBase
         return StatusCode((int)response.StatusCode, response);
     }
 }
+
+public record CheckoutRequest(
+    int ShippingAddressId,
+    PaymentMethod PaymentMethod,
+    string? DiscountCode,
+    string? PaymentToken);

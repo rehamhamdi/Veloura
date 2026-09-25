@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Veloura.Domain.Entities;
 
 namespace Veloura.Application.Interfaces;
@@ -19,4 +20,6 @@ public interface IAppDbContext
     DbSet<Payment> Payments { get; }
     DbSet<SiteSettings> SiteSettings { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
+
 }

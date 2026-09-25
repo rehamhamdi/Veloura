@@ -37,19 +37,23 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, EfUserRepository>();
         services.AddScoped<IAddressRepository, EfAddressRepository>();
         services.AddScoped<IContactMessageRepository, EfContactMessageRepository>();
-        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
-        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-        services.AddScoped<IUserRepository, EfUserRepository>();
-        services.AddScoped<IAddressRepository, EfAddressRepository>();
-
         services.AddScoped<IProductRepository, EfProductRepository>();
         services.AddScoped<IProductImageRepository, EfProductImageRepository>();
         services.AddScoped<IWishlistItemRepository, EfWishlistItemRepository>();
         services.AddScoped<IPaymentRepository, EfPaymentRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-        services.AddScoped<IPaymentGateway, MockPaymentGateway>();
         services.AddScoped<IEmailService, SmtpEmailService>();
+
+        // Stripe
+        services.Configure<StripeOptions>(configuration.GetSection("Stripe"));
+
+        var useStripe = !string.IsNullOrWhiteSpace(configuration["Stripe:SecretKey"]);
+
+        if (useStripe)
+            services.AddScoped<IPaymentGateway, StripePaymentGateway>();
+        else
+            services.AddScoped<IPaymentGateway, MockPaymentGateway>();
 
         var cloudinarySettings = configuration.GetSection("Cloudinary");
 

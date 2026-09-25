@@ -1,6 +1,6 @@
 using MediatR;
-using Veloura.Application.Common.DTOs;
 using Veloura.Application.Common.Exceptions;
+using Veloura.Application.DTOs.Account;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 
@@ -41,22 +41,6 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, UserDt
                 cancellationToken))
         {
             throw new EmailAlreadyExistsException(request.Email);
-        }
-
-        var isChangingPassword =
-            !string.IsNullOrWhiteSpace(request.NewPassword);
-
-        if (isChangingPassword)
-        {
-            if (!_passwordHasher.Verify(
-                request.CurrentPassword!,
-                user.PasswordHash))
-            {
-                throw new InvalidCurrentPasswordException();
-            }
-
-            user.PasswordHash = _passwordHasher.Hash(
-                request.NewPassword!);
         }
 
         user.Name = request.Name;

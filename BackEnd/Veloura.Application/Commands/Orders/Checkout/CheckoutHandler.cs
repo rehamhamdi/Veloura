@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Veloura.Application.Common.DTOs;
 using Veloura.Application.Common.Wrappers;
 using Veloura.Application.DTOs.Orders;
 using Veloura.Application.DTOs.Payments;

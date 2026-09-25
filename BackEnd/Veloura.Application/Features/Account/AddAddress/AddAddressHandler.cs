@@ -1,5 +1,5 @@
 using MediatR;
-using Veloura.Application.Common.DTOs;
+using Veloura.Application.DTOs.Account;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 

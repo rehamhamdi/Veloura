@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Veloura.Application.Common.Wrappers;
+using Veloura.Application.DTOs.Account;
 using Veloura.Application.Features.Account.AddAddress;
 using Veloura.Application.Features.Account.DeleteAddress;
 using Veloura.Application.Features.Account.GetAddresses;
 using Veloura.Application.Features.Account.UpdateAddress;
 using Veloura.Application.Features.Account.UpdateProfile;
 using Veloura.Application.Features.Auth.GetMe;
+
 
 namespace Veloura.API.Controllers;
 
@@ -52,9 +54,8 @@ public class AccountController : ControllerBase
         var command = new UpdateProfileCommand(
             CurrentUserId,
             request.Name,
-            request.Email,
-            request.CurrentPassword,
-            request.NewPassword);
+            request.Email
+          );
 
         var result = await _sender.Send(command, ct);
 
@@ -145,29 +146,3 @@ public class AccountController : ControllerBase
     }
 }
 
-// Request-only models (no UserId property) so a client can never supply or
-// override the owning user id via the request body - it is always taken from
-// the authenticated user's JWT claim (CurrentUserId) instead.
-public record UpdateProfileRequest(
-    string Name,
-    string Email,
-    string? CurrentPassword,
-    string? NewPassword);
-
-public record AddAddressRequest(
-    string? Label,
-    string Street,
-    string City,
-    string State,
-    string PostalCode,
-    string Country,
-    bool IsDefault);
-
-public record UpdateAddressRequest(
-    string? Label,
-    string Street,
-    string City,
-    string State,
-    string PostalCode,
-    string Country,
-    bool IsDefault);

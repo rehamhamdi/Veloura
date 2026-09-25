@@ -6,6 +6,7 @@ using Veloura.Application.Common.Behaviors;
 using Veloura.Application.Common.Wrappers;
 using Veloura.Application.Services;
 using Veloura.Application.Interfaces;
+using Veloura.Application.DTOs.Account;
 
 namespace Veloura.Application;
 

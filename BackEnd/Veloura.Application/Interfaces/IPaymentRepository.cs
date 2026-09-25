@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Veloura.Domain.Entities;
+﻿using Veloura.Domain.Entities;
 
-namespace Veloura.Application.Interfaces
+namespace Veloura.Application.Interfaces;
+
+public interface IPaymentRepository
 {
-    public interface IPaymentRepository
-    {
-        Task<Payment?> GetByIdAsync(int id);
-
-        Task<Payment?> GetByOrderIdAsync(int orderId);
-
-        Task AddAsync(Payment payment);
-
-        void Update(Payment payment);
-    }
+    Task<Payment?> GetByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Payment?> GetByOrderIdAsync(int orderId, CancellationToken cancellationToken);
+    Task AddAsync(Payment payment, CancellationToken cancellationToken);
+    Task UpdateAsync(Payment payment, CancellationToken cancellationToken);
 }

@@ -1,15 +1,14 @@
-﻿using Veloura.Application.Common.Models;
-using Veloura.Domain.Entities;
+﻿using Veloura.Application.DTOs.Payments;
 using Veloura.Domain.Enums;
 
-namespace Veloura.Application.Interfaces
+namespace Veloura.Application.Interfaces;
+
+public interface IPaymentGateway
 {
-    public interface IPaymentGateway
-    {
-        Task<PaymentGatewayResult> ProcessPaymentAsync(
-            int orderId,
-            decimal amount,
-            PaymentMethod paymentMethod,
-            CancellationToken cancellationToken = default);
-    }
+    Task<PaymentGatewayResult> ChargeAsync(
+        int orderId,
+        decimal amount,
+        PaymentMethod paymentMethod,
+        string? paymentToken, 
+        CancellationToken cancellationToken);
 }

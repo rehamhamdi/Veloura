@@ -8,8 +8,6 @@ namespace Veloura.Domain.Enums
     {
         CashOnDelivery = 0,
         Visa = 1,
-        Fawry = 2,
-        VodafoneCash = 3,
-        ValU = 4
+       
     }
 }

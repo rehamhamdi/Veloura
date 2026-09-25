@@ -1,118 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Veloura.Application.Interfaces;
+﻿using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 using Veloura.Domain.Enums;
 
-namespace Veloura.Application.Services
+namespace Veloura.Application.Services;
+
+public class PaymentService : IPaymentService
 {
-    public class PaymentService : IPaymentService
+    private readonly IPaymentRepository _paymentRepository;
+
+    public PaymentService(IPaymentRepository paymentRepository)
     {
-        private readonly IPaymentRepository _paymentRepository;
-        private readonly IAppDbContext _context;
-        private readonly IPaymentGateway _paymentGateway;
+        _paymentRepository = paymentRepository;
+    }
 
-        public PaymentService(
-            IPaymentRepository paymentRepository,
-            IAppDbContext context,
-            IPaymentGateway paymentGateway)
+    public async Task<Payment> CreatePaymentAsync(
+        int orderId,
+        decimal amount,
+        PaymentMethod paymentMethod)
+    {
+        var payment = new Payment
         {
-            _paymentRepository = paymentRepository;
-            _context = context;
-            _paymentGateway = paymentGateway;
-        }
+            OrderId = orderId,
+            Amount = amount,
+            PaymentMethod = paymentMethod,
+            Status = PaymentStatus.Pending,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        public async Task<Payment> CreatePaymentAsync(
-     int orderId,
-     decimal amount,
-     PaymentMethod paymentMethod)
-        {
-            var existingPayment =
-                await _paymentRepository.GetByOrderIdAsync(orderId);
+        await _paymentRepository.AddAsync(payment, CancellationToken.None);
 
-            if (existingPayment != null)
-                return existingPayment;
+        return payment;
+    }
 
-            var payment = new Payment
-            {
-                OrderId = orderId,
-                Amount = amount,
-                PaymentMethod = paymentMethod,
-                Status = PaymentStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
+    public async Task<bool> MarkAsPaidAsync(
+        int paymentId,
+        string? transactionId = null,
+        string? providerReference = null)
+    {
+        var payment = await _paymentRepository.GetByIdAsync(paymentId, CancellationToken.None);
+        if (payment is null) return false;
 
-            await _paymentRepository.AddAsync(payment);
-            await _context.SaveChangesAsync();
+        payment.Status = PaymentStatus.Paid;
+        payment.TransactionId = transactionId;
+        payment.ProviderReference = providerReference;
+        payment.PaidAt = DateTime.UtcNow;
 
-            // Cash on Delivery doesn't need a payment gateway
-            if (paymentMethod == PaymentMethod.CashOnDelivery)
-                return payment;
+        await _paymentRepository.UpdateAsync(payment, CancellationToken.None);
+        return true;
+    }
 
-            var gatewayResult = await _paymentGateway.ProcessPaymentAsync(
-                orderId,
-                amount,
-                paymentMethod);
+    public async Task<bool> MarkAsFailedAsync(int paymentId)
+    {
+        var payment = await _paymentRepository.GetByIdAsync(paymentId, CancellationToken.None);
+        if (payment is null) return false;
 
-            if (gatewayResult.IsSuccess)
-            {
-                payment.Status = PaymentStatus.Paid;
-                payment.TransactionId = gatewayResult.TransactionId;
-                payment.ProviderReference = gatewayResult.ProviderReference;
-                payment.PaidAt = DateTime.UtcNow;
-            }
-            else
-            {
-                payment.Status = PaymentStatus.Failed;
-            }
+        payment.Status = PaymentStatus.Failed;
 
-            _paymentRepository.Update(payment);
-            await _context.SaveChangesAsync();
-
-            return payment;
-        }
-
-        public async Task<bool> MarkAsPaidAsync(
-            int paymentId,
-            string? transactionId = null,
-            string? providerReference = null)
-        {
-            var payment =
-                await _paymentRepository.GetByIdAsync(paymentId);
-
-            if (payment == null)
-                return false;
-
-            payment.Status = PaymentStatus.Paid;
-            payment.TransactionId = transactionId;
-            payment.ProviderReference = providerReference;
-            payment.PaidAt = DateTime.UtcNow;
-
-            _paymentRepository.Update(payment);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<bool> MarkAsFailedAsync(int paymentId)
-        {
-            var payment =
-                await _paymentRepository.GetByIdAsync(paymentId);
-
-            if (payment == null)
-                return false;
-
-            payment.Status = PaymentStatus.Failed;
-
-            _paymentRepository.Update(payment);
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
+        await _paymentRepository.UpdateAsync(payment, CancellationToken.None);
+        return true;
     }
 }

@@ -1,46 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
 using Veloura.Infrastructure.Persistence;
 
-namespace Veloura.Infrastructure.Repositories
+namespace Veloura.Infrastructure.Repositories;
+
+public class EfPaymentRepository : IPaymentRepository
 {
-    public class EfPaymentRepository : IPaymentRepository
+    private readonly AppDbContext _db;
+    public EfPaymentRepository(AppDbContext db) => _db = db;
+
+    public Task<Payment?> GetByIdAsync(int id, CancellationToken ct) =>
+        _db.Payments.FirstOrDefaultAsync(p => p.Id == id, ct);
+
+    public Task<Payment?> GetByOrderIdAsync(int orderId, CancellationToken ct) =>
+        _db.Payments.FirstOrDefaultAsync(p => p.OrderId == orderId, ct);
+
+    public async Task AddAsync(Payment payment, CancellationToken ct)
     {
-        private readonly AppDbContext _context;
+        _db.Payments.Add(payment);
+        await _db.SaveChangesAsync(ct);
+    }
 
-        public EfPaymentRepository(AppDbContext context)
-        {
-            _context = context;
-        }
-
-        public async Task<Payment?> GetByIdAsync(int id)
-        {
-            return await _context.Payments
-                .Include(p => p.Order)
-                .FirstOrDefaultAsync(p => p.Id == id);
-        }
-
-        public async Task<Payment?> GetByOrderIdAsync(int orderId)
-        {
-            return await _context.Payments
-                .FirstOrDefaultAsync(p => p.OrderId == orderId);
-        }
-
-        public async Task AddAsync(Payment payment)
-        {
-            await _context.Payments.AddAsync(payment);
-        }
-
-        public void Update(Payment payment)
-        {
-            _context.Payments.Update(payment);
-        }
-}
-
+    public async Task UpdateAsync(Payment payment, CancellationToken ct)
+    {
+        _db.Payments.Update(payment);
+        await _db.SaveChangesAsync(ct);
+    }
 }

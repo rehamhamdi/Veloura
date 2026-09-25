@@ -4,9 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Veloura.Application.Common.Behaviors;
 using Veloura.Application.Common.Wrappers;
-using Veloura.Application.Services;
 using Veloura.Application.Interfaces;
-using Veloura.Application.DTOs.Account;
+using Veloura.Application.Services;
 
 namespace Veloura.Application;
 
@@ -24,12 +23,9 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(assembly);
 
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        services.AddScoped<ResponseHandler>();
+        services.AddSingleton<ResponseHandler>();   
         services.AddScoped<IPaymentService, PaymentService>();
-        services.AddSingleton<ResponseHandler>();
-        services.AddScoped<IPaymentService, PaymentService>();
+
         return services;
     }
 }

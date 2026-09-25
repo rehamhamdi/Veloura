@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Reflection;
 using Veloura.Application.Interfaces;
 using Veloura.Domain.Entities;
@@ -44,5 +45,8 @@ namespace Veloura.Infrastructure.Persistence
 
             return base.SaveChangesAsync(cancellationToken);
         }
+
+        public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default) =>
+            Database.BeginTransactionAsync(cancellationToken);
     }
 }

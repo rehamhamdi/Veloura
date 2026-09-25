@@ -43,22 +43,6 @@ public class UpdateProfileHandler : IRequestHandler<UpdateProfileCommand, UserDt
             throw new EmailAlreadyExistsException(request.Email);
         }
 
-        var isChangingPassword =
-            !string.IsNullOrWhiteSpace(request.NewPassword);
-
-        if (isChangingPassword)
-        {
-            if (!_passwordHasher.Verify(
-                request.CurrentPassword!,
-                user.PasswordHash))
-            {
-                throw new InvalidCurrentPasswordException();
-            }
-
-            user.PasswordHash = _passwordHasher.Hash(
-                request.NewPassword!);
-        }
-
         user.Name = request.Name;
         user.Email = request.Email;
 

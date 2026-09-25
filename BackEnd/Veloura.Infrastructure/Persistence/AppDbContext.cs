@@ -22,6 +22,7 @@ namespace Veloura.Infrastructure.Persistence
         public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
         public DbSet<Discount> Discounts => Set<Discount>();
         public DbSet<DiscountUsage> DiscountUsages => Set<DiscountUsage>();
+        public DbSet<SiteSettings> SiteSettings => Set<SiteSettings>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

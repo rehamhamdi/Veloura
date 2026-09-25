@@ -17,5 +17,6 @@ public interface IAppDbContext
     DbSet<DiscountUsage> DiscountUsages { get; }
 
     DbSet<Payment> Payments { get; }
+    DbSet<SiteSettings> SiteSettings { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

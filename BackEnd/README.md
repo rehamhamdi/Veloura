@@ -1,21 +1,22 @@
 # Veloura E-Commerce Backend
 
-Veloura is an e-commerce backend API built with **ASP.NET Core 10** using **Clean Architecture**, **CQRS**, and **Entity Framework Core**.
+Veloura is an e-commerce backend API built with **ASP.NET Core 9** using **Clean Architecture**, **CQRS**, and **Entity Framework Core**.
 
-The backend provides the foundation for managing users, products, shopping carts, wishlists, addresses, orders, and contact messages.
+The backend provides the foundation for managing users, products, shopping carts, wishlists, addresses, orders, contact messages, Admin (Dashboard, Discounts, Settings) and Payment.
 
 ---
 
 ## Tech Stack
 
-* **C# / ASP.NET Core 10**
-* **Entity Framework Core 10**
+* **C# / ASP.NET Core 9**
+* **Entity Framework Core 9**
 * **SQL Server**
 * **MediatR**
 * **CQRS**
 * **Clean Architecture**
 * **Swagger / OpenAPI**
 * **Serilog**
+* **Stripe API**
 * **Git & GitHub**
 
 ---
